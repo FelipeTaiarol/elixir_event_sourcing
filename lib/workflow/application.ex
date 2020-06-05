@@ -11,6 +11,7 @@ defmodule Workflows.Application do
     # List all child processes to be supervised
     children = [
       Workflows.Repo,
+      Workflows.ReadModelRepo,
       Workflows.Endpoint,
       supervisor(Absinthe.Subscription, [Workflows.Endpoint])
     ]

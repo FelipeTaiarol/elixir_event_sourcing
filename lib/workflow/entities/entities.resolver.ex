@@ -1,10 +1,7 @@
 defmodule Workflows.Entities.Resolver do
   alias Workflows.Repo
   alias Workflows.Entities.{Entity, Event, Action}
-
-  defmodule Workflows.Entities.Resolver.EventTypeAndPayload do
-    defstruct [:name, :payload]
-  end
+  alias Workflows.ReadModelRepo
 
   def get_events(_, _, _) do
     events = Repo.all(Event)
@@ -21,7 +18,7 @@ defmodule Workflows.Entities.Resolver do
     user_id = 1
     args = Map.put(args, :created_by, user_id)
 
-    entity = Repo.get_by!(Entity, id: args.entity_id)
+    entity = Repo.get!(Entity, args.entity_id)
 
     Repo.transaction(fn ->
       action = persist_action(args)
@@ -35,6 +32,8 @@ defmodule Workflows.Entities.Resolver do
       update_entity_version(entity, new_version)
 
       IO.puts "Action #{inspect action} #{inspect events}"
+
+      read_model_projection(entity.id)
 
       new_version
     end)
@@ -66,11 +65,15 @@ defmodule Workflows.Entities.Resolver do
     }) |> Repo.update!
   end
 
-  def dispatch_action(%{type: "add_task"} = action) do
+  defp dispatch_action(%{type: "add_task"} = action) do
     [%{type: "task_added", payload: action.payload }]
   end
 
-  def dispatch_action(action) do
+  defp dispatch_action(action) do
     raise "Unknown action type #{action.type}"
+  end
+
+  defp read_model_projection(_entity_id) do
+    # TODO
   end
 end

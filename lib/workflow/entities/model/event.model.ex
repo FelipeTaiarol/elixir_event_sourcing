@@ -1,6 +1,7 @@
 defmodule Workflows.Entities.Event do
   use Ecto.Schema
   import Ecto.Changeset
+  @schema_prefix "entities"
 
   schema "entity_events" do
     field :type, :string

@@ -1,6 +1,7 @@
 defmodule Workflows.Entities.Action do
   use Ecto.Schema
   import Ecto.Changeset
+  @schema_prefix "entities"
 
   schema "entity_actions" do
     field :type, :string

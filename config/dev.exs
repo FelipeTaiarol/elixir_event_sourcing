@@ -31,4 +31,15 @@ config :workflows, Workflows.Repo,
   password: "postgres",
   database: "workflows",
   hostname: "localhost",
-  pool_size: 10
+  pool_size: 10,
+  after_connect: {Postgrex, :query!, ["SET search_path TO entities;", []]},
+  priv: "priv/repo/entities"
+
+config :workflows, Workflows.ReadModelRepo,
+  username: "postgres",
+  password: "postgres",
+  database: "workflows",
+  hostname: "localhost",
+  pool_size: 10,
+  after_connect: {Postgrex, :query!, ["SET search_path TO read;", []]},
+  priv: "priv/repo/read_model"

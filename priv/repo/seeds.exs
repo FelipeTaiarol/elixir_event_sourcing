@@ -24,7 +24,7 @@ actions = [
   }
 ]
 
-[action | t] = Enum.map(actions, &Repo.insert!/1)
+[action | _] = Enum.map(actions, &Repo.insert!/1)
 
 events = [
   %Event{
