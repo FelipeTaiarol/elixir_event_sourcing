@@ -7,7 +7,7 @@ defmodule Workflows.Core.WorkflowEntity do
   defstruct [:id, :name, :version]
 
   @impl true
-  def get_entity_type(), do:  "workflow"
+  def get_entity_type(), do: "workflow"
 
   @impl true
   def handle_create(_context, id, %{name: name}) do

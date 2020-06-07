@@ -20,7 +20,7 @@ config :workflows, Workflows.Repo,
   after_connect: {Postgrex, :query!, ["SET search_path TO entities;", []]},
   priv: "priv/repo/entities"
 
-config :workflows, Workflows.ReadModelRepo,
+config :workflows, Workflows.ReadModel.Repo,
   username: "postgres",
   password: "postgres",
   database: "workflows_test",

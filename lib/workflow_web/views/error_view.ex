@@ -1,6 +1,6 @@
 defmodule Workflows.ErrorView do
   use Phoenix.View,
-    root: "lib/getaways_web/templates",
+    root: "lib/workflows_web/templates",
     namespace: Workflows
 
   def template_not_found(template, _assigns) do

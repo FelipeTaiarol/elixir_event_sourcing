@@ -13,7 +13,7 @@ config :cors_plug,
   methods: ["GET", "POST"]
 
 config :workflows,
-  ecto_repos: [Workflows.Repo, Workflows.ReadModelRepo]
+  ecto_repos: [Workflows.Repo, Workflows.ReadModel.Repo]
 
 # Configures the endpoint
 config :workflows, Workflows.Endpoint,
