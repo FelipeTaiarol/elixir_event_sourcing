@@ -1,7 +1,7 @@
 defmodule Workflows.Schema do
   use Absinthe.Schema
   alias Workflows.Core.Workflow
-  alias Workflows.Core.Workflow.ActionRows.{SetName}
+  alias Workflows.Core.Workflow.Actions.{SetName}
 
   query do
     @desc "Get Workflow"
@@ -14,7 +14,7 @@ defmodule Workflows.Schema do
       end)
     end
 
-    # @desc "Get EntityRow EventRows"
+    # @desc "Get EntityRow EventRow"
     # field :events, list_of(:event) do
     #   resolve &Workflows.Entities.Resolver.get_events/3
     # end

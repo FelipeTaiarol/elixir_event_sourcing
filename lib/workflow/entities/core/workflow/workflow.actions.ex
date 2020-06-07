@@ -1,4 +1,4 @@
-defmodule Workflows.Core.Workflow.ActionRows do
+defmodule Workflows.Core.Workflow.Actions do
   defmodule CreateWorkflow do
     defstruct [
       :id,

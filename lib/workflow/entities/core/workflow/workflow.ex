@@ -2,8 +2,8 @@ defmodule Workflows.Core.Workflow do
   import Ecto.Query
   alias Workflows.Entities.{EventRow, ActionRow, EntityRow}
   alias Workflows.Repo
-  alias Workflows.Core.Workflow.ActionRows.{CreateWorkflow, SetName}
-  alias Workflows.Core.Workflow.EventRows.{WorkflowCreated, NameChanged}
+  alias Workflows.Core.Workflow.Actions.{CreateWorkflow, SetName}
+  alias Workflows.Core.Workflow.Events.{WorkflowCreated, NameChanged}
 
   defstruct [:id, :name, :version]
 
