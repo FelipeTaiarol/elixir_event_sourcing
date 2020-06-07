@@ -141,7 +141,7 @@ defmodule Entities.Entity do
     Repo.update_all(query, [])
   end
 
-  def get(module, context, id) do
+  def get(module, _context, id) do
     Repo.get!(EntityRow, id)
 
     query =

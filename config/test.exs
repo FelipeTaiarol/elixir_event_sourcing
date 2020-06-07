@@ -1,34 +1,30 @@
 use Mix.Config
 
+config :pbkdf2_elixir, :rounds, 1
+
+# We don't run a server during test. If one is required,
+# you can enable the server option below.
 config :workflows, Workflows.Endpoint,
-  http: [port: 4000],
-  debug_errors: false,
-  code_reloader: true,
-  check_origin: false,
-  watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch-stdin",
-      cd: Path.expand("../assets", __DIR__)
-    ]
-  ]
+  http: [port: 4002],
+  server: false
 
-# Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+# Print only warnings and errors during test
+config :logger, level: :warn
 
-# Set a higher stacktrace during development. Avoid configuring such
-# in production as building large stacktraces may be expensive.
-config :phoenix, :stacktrace_depth, 20
-
-# Initialize plugs at runtime for faster development compilation
-config :phoenix, :plug_init_mode, :runtime
-
-# Configure your database
 config :workflows, Workflows.Repo,
   username: "postgres",
   password: "postgres",
   database: "workflows_test",
   hostname: "localhost",
-  pool_size: 10
+  pool: Ecto.Adapters.SQL.Sandbox,
+  after_connect: {Postgrex, :query!, ["SET search_path TO entities;", []]},
+  priv: "priv/repo/entities"
+
+config :workflows, Workflows.ReadModelRepo,
+  username: "postgres",
+  password: "postgres",
+  database: "workflows_test",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox,
+  after_connect: {Postgrex, :query!, ["SET search_path TO read;", []]},
+  priv: "priv/repo/read_model"

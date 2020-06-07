@@ -1,5 +1,6 @@
 defmodule Workflows.Schema do
   use Absinthe.Schema
+  alias Workflows.Schema.Resolver
   alias Workflows.Core.Workflow.Actions.{SetName}
   alias Workflows.Core.WorkflowEntity
 
@@ -7,50 +8,22 @@ defmodule Workflows.Schema do
     @desc "Get Workflow"
     field :workflow, :workflow do
       arg(:id, non_null(:integer))
-
-      resolve(fn _, args, _ ->
-        data = WorkflowEntity.get(%{user_id: 1}, args.id)
-        {:ok, data}
-      end)
-    end
-
-    @desc "Get Workflow Entity"
-    field :workflow2, :workflow do
-      arg(:id, non_null(:integer))
-
-      resolve(fn _, args, _ ->
-        data = WorkflowEntity.get(%{user_id: 1}, args.id)
-        {:ok, data}
-      end)
+      resolve(&Resolver.get_workflow/3)
     end
   end
 
   mutation do
     @desc "Create a Workflow"
-    field :create_workflow, :integer do
+    field :create_workflow, :workflow do
       arg(:name, non_null(:string))
-
-      resolve(fn _, args, _ ->
-        data = WorkflowEntity.create(%{user_id: 1}, args)
-        {:ok, data}
-      end)
+      resolve(&Resolver.create_workflow/3)
     end
 
     @desc "Change Workflow name"
     field :change_workflow_name, :workflow do
       arg(:workflow_id, non_null(:integer))
       arg(:name, non_null(:string))
-
-      resolve(fn _, args, _ ->
-        data =
-          WorkflowEntity.send_action(%{user_id: 1}, args.workflow_id, %SetName{
-            id: args.workflow_id,
-            name: args.name
-          })
-
-        IO.puts(inspect(data))
-        {:ok, data}
-      end)
+      resolve(&Resolver.change_workflow_name/3)
     end
   end
 
@@ -69,6 +42,7 @@ defmodule Workflows.Schema do
   object :workflow do
     field :id, non_null(:integer)
     field :name, non_null(:string)
+    field :version, non_null(:integer)
   end
 
   input_object :add_task do

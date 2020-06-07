@@ -25,7 +25,7 @@ defmodule Workflows.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  # defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
   # defp elixirc_paths(:dev),  do: ["lib", "dev/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -34,20 +34,21 @@ defmodule Workflows.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.3"},
-      {:phoenix_pubsub, "~> 1.1"},
-      {:phoenix_ecto, "~> 4.0"},
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"},
+      {:phoenix, "~> 1.5"},
+      {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_ecto, "~> 4.1"},
+      {:ecto_sql, "~> 3.4"},
+      {:postgrex, "~> 0.15.5"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:absinthe, "~> 1.4.2"},
-      {:absinthe_plug, "~> 1.4.0"},
-      {:absinthe_phoenix, "~> 1.4.0"},
+      {:absinthe, "~> 1.5"},
+      {:absinthe_plug, "~> 1.5"},
+      {:absinthe_phoenix, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.0"},
       {:cors_plug, "~> 2.0"},
       {:dataloader, "~> 1.0.6"},
+      {:poison, "~> 4.0"}
     ]
   end
 
@@ -59,9 +60,9 @@ defmodule Workflows.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["run priv/repo/drop_all.exs", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["run priv/repo/drop_all.exs", "ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.setup", "test"]
     ]
   end
 end
