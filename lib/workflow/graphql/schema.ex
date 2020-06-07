@@ -6,11 +6,12 @@ defmodule Workflows.Schema do
   query do
     @desc "Get Workflow"
     field :workflow, :workflow do
-      arg :id, non_null(:integer)
-      resolve fn (_, args, _) ->
+      arg(:id, non_null(:integer))
+
+      resolve(fn _, args, _ ->
         data = Workflow.get(%{user_id: 1}, args.id)
         {:ok, data}
-      end
+      end)
     end
 
     # @desc "Get Entity Events"
@@ -22,25 +23,29 @@ defmodule Workflows.Schema do
   mutation do
     @desc "Create a Workflow"
     field :create_workflow, :integer do
-      arg :name, non_null(:string)
-      resolve fn (_, args, _) ->
+      arg(:name, non_null(:string))
+
+      resolve(fn _, args, _ ->
         data = Workflow.create(%{user_id: 1}, args)
         {:ok, data}
-      end
+      end)
     end
 
     @desc "Change Workflow name"
     field :change_workflow_name, :workflow do
-      arg :workflow_id, non_null(:integer)
-      arg :name, non_null(:string)
-      resolve fn (_, args, _) ->
-        data = Workflow.send_action(%{user_id: 1}, args.workflow_id, %SetName{
-          id: args.workflow_id,
-          name: args.name
-        })
-        IO.puts inspect data
+      arg(:workflow_id, non_null(:integer))
+      arg(:name, non_null(:string))
+
+      resolve(fn _, args, _ ->
+        data =
+          Workflow.send_action(%{user_id: 1}, args.workflow_id, %SetName{
+            id: args.workflow_id,
+            name: args.name
+          })
+
+        IO.puts(inspect(data))
         {:ok, data}
-      end
+      end)
     end
   end
 
@@ -70,6 +75,4 @@ defmodule Workflows.Schema do
     field :id, non_null(:string)
     field :description, :string
   end
-
-
 end

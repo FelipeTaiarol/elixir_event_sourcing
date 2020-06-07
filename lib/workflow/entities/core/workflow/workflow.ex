@@ -1,4 +1,3 @@
-
 defmodule Workflows.Core.Workflow do
   import Ecto.Query
   alias Workflows.Entities.{Event, Action, Entity}
@@ -9,55 +8,66 @@ defmodule Workflows.Core.Workflow do
   defstruct [:id, :name, :version]
 
   @type t :: %__MODULE__{
-    id: Integer.t(),
-    name: String.t(),
-    version: Integer.t()
-  }
+          id: Integer.t(),
+          name: String.t(),
+          version: Integer.t()
+        }
 
   def get(_context, id) when is_integer(id) do
     get_current_state(id)
   end
 
   def create(context, %{name: name}) do
-    {:ok, result} = Repo.transaction(fn ->
-      entity = %Entity{
-        version: 0,
-        type: "workflow"
-      }|> Repo.insert!
-      action = %CreateWorkflow{
-        id:  entity.id,
-        name: name
-      }
-      send_action(context, entity.id, action)
-    end)
+    {:ok, result} =
+      Repo.transaction(fn ->
+        entity =
+          %Entity{
+            version: 0,
+            type: "workflow"
+          }
+          |> Repo.insert!()
+
+        action = %CreateWorkflow{
+          id: entity.id,
+          name: name
+        }
+
+        send_action(context, entity.id, action)
+      end)
+
     result
   end
 
   def send_action(context, id, action) do
-    {:ok, result} = Repo.transaction(fn ->
-      snapshot = get_current_state(id);
-      current_version = get_version(snapshot)
+    {:ok, result} =
+      Repo.transaction(fn ->
+        snapshot = get_current_state(id)
+        current_version = get_version(snapshot)
 
-      event = dispatch_action(snapshot, action)
+        event = dispatch_action(snapshot, action)
 
-      action_row = persist_action(context, id, action)
+        action_row = persist_action(context, id, action)
 
-      persist_event(action_row, event, current_version + 1)
+        persist_event(action_row, event, current_version + 1)
 
-      update_entity_version(id, current_version + 1)
+        update_entity_version(id, current_version, current_version + 1)
 
-      _apply_event(snapshot, event)
-    end)
+        _apply_event(snapshot, event)
+      end)
+
     result
   end
 
   defp dispatch_action(state, %CreateWorkflow{id: id, name: name}) do
     cond do
-      is_nil(state) -> %WorkflowCreated{
-        id: id,
-        name: name
-      }
-      true -> raise "There is already a workflow with id #{id}"
+      is_nil(state) ->
+        %WorkflowCreated{
+          id: id,
+          name: name
+        }
+
+      true ->
+        raise "There is already a workflow with id #{id}"
     end
   end
 
@@ -79,24 +89,27 @@ defmodule Workflows.Core.Workflow do
   defp get_current_state(id) do
     Repo.get!(Entity, id)
 
-    query = from e in Event,
+    query =
+      from e in Event,
         where: e.entity_id == ^id,
         order_by: e.entity_version,
         select: e
 
     Repo.all(query)
-      |> Enum.map(&event_row_to_event/1)
-      |> Enum.reduce(nil, fn (event, state) -> _apply_event(state, event) end)
+    |> Enum.map(&event_row_to_event/1)
+    |> Enum.reduce(nil, fn event, state -> _apply_event(state, event) end)
   end
 
   def event_row_to_event(%Event{} = event_row) do
     module = String.to_existing_atom(event_row.type)
 
     # Workaround so that we have an struct (the keys are atoms) and not a map (the keys are strings)
-    {:ok, payload} = event_row.payload
-      |> Poison.encode
+    {:ok, payload} =
+      event_row.payload
+      |> Poison.encode()
       |> (fn {:ok, json} -> json end).()
       |> Poison.decode(as: struct!(module))
+
     payload
   end
 
@@ -130,27 +143,30 @@ defmodule Workflows.Core.Workflow do
       entity_id: entity_id,
       entity_type: "workflow"
     })
-    |> Repo.insert!
+    |> Repo.insert!()
   end
 
   defp persist_event(%Action{} = action, event, entity_version) when is_integer(entity_version) do
     %Event{}
-      |> Event.changeset(%{
-        action_id: action.id,
-        created_by: action.created_by,
-        entity_id: action.entity_id,
-        entity_type: "workflow",
-        type: event.__struct__,
-        payload: event,
-        entity_version: entity_version
-      })
-      |> Repo.insert!
+    |> Event.changeset(%{
+      action_id: action.id,
+      created_by: action.created_by,
+      entity_id: action.entity_id,
+      entity_type: "workflow",
+      type: event.__struct__,
+      payload: event,
+      entity_version: entity_version
+    })
+    |> Repo.insert!()
   end
 
-  defp update_entity_version(id, new_version) when is_integer(id) and is_integer(new_version) do
-    query = from e in Entity,
-      where: e.id == ^id,
-      update: [set: [version: ^new_version]]
+  defp update_entity_version(id, expected_version, new_version)
+       when is_integer(id) and is_integer(expected_version) and is_integer(new_version) do
+    query =
+      from e in Entity,
+        where: e.id == ^id,
+        update: [set: [version: ^new_version]]
+
     Repo.update_all(query, [])
   end
 end

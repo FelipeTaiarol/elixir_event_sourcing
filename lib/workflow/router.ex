@@ -9,10 +9,8 @@ defmodule Workflows.Router do
   scope "/" do
     pipe_through :api
 
-    forward "/api", Absinthe.Plug,
-      schema: Workflows.Schema
+    forward "/api", Absinthe.Plug, schema: Workflows.Schema
 
-    forward "/graphiql", Absinthe.Plug.GraphiQL,
-      schema: Workflows.Schema
-    end
+    forward "/graphiql", Absinthe.Plug.GraphiQL, schema: Workflows.Schema
+  end
 end

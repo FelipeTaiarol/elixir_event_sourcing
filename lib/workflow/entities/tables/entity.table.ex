@@ -11,7 +11,7 @@ defmodule Workflows.Entities.Entity do
 
   def changeset(entity, attrs) do
     required_fields = [:version, :type]
-    optional_fields = [];
+    optional_fields = []
     entity |> cast(attrs, required_fields ++ optional_fields)
   end
 end

@@ -10,13 +10,7 @@ defmodule Workflows.ReadModel.Workflow do
 
   def changeset(event, attrs) do
     required_fields = [:name]
-    optional_fields = [];
+    optional_fields = []
     event |> cast(attrs, required_fields ++ optional_fields)
   end
-
-  # def handle_event(%Workflow{} = workflow, %Event{type: "workflow_created"} = event) do
-  #   %Workflow{
-
-  #   }
-  # end
 end

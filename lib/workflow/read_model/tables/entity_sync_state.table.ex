@@ -11,7 +11,7 @@ defmodule Workflows.ReadModel.EntitySyncState do
 
   def changeset(event, attrs) do
     required_fields = [:entity_id, :entity_version]
-    optional_fields = [];
+    optional_fields = []
     event |> cast(attrs, required_fields ++ optional_fields)
   end
 end

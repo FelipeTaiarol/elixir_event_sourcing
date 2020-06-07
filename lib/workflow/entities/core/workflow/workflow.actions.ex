@@ -1,4 +1,3 @@
-
 defmodule Workflows.Core.Workflow.Actions do
   defmodule CreateWorkflow do
     defstruct [

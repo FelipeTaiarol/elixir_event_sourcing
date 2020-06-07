@@ -1,5 +1,3 @@
-
-
 alias Workflows.Core.Workflow
 alias Workflows.Core.Workflow.Actions.SetName
 

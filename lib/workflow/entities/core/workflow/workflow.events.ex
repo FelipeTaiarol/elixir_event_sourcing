@@ -1,4 +1,3 @@
-
 defmodule Workflows.Core.Workflow.Events do
   defmodule WorkflowCreated do
     defstruct [
