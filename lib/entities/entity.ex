@@ -2,10 +2,24 @@ defmodule Entities.Entity do
   import Ecto.Query
   alias Entities.Entity.{EventRow, ActionRow, EntityRow}
   alias Workflows.Repo
+  alias Entities.Context
 
-  @callback handle_action(state :: any, action :: any) :: any
-  @callback apply_event(state :: any, event :: any) :: any
+  @doc """
+    Receives the current state of the Entity and an Action and it should return an Event
+  """
+  @callback handle_action(context :: any, state :: any, action :: any) :: any
+  @doc """
+    Receives the current state of the Entity and an Event and it should return the changed Entity state.
+  """
+  @callback apply_event(context :: any, state :: any, event :: any) :: any
+  @doc """
+    Returns the Entity type.
+  """
   @callback get_entity_type() :: String.t()
+  @doc """
+    It should return the action that creates this Entity.
+    The Action will also be sent to handle_action/3
+  """
   @callback handle_create(context :: any, id :: Integer.t(), args :: any) :: any
 
   defmacro __using__([]) do
@@ -68,7 +82,7 @@ defmodule Entities.Entity do
 
         current_version = get_version(snapshot)
 
-        event = module.handle_action(snapshot, action)
+        event = module.handle_action(context, snapshot, action)
 
         action_row = persist_action(module, context, id, action)
 
@@ -76,7 +90,7 @@ defmodule Entities.Entity do
 
         update_entity_version(id, current_version, current_version + 1)
 
-        _apply_event(module, snapshot, event)
+        _apply_event(module, context, snapshot, event)
       end)
 
     result
@@ -127,7 +141,7 @@ defmodule Entities.Entity do
     Repo.update_all(query, [])
   end
 
-  def get(module, _context, id) do
+  def get(module, context, id) do
     Repo.get!(EntityRow, id)
 
     query =
@@ -137,25 +151,25 @@ defmodule Entities.Entity do
         select: e
 
     Repo.all(query)
-    |> Enum.map(&event_row_to_event/1)
-    |> Enum.reduce(nil, fn event, state -> _apply_event(module, state, event) end)
+    |> Enum.map(&row_to_event_and_context/1)
+    |> Enum.reduce(nil, fn {event, context}, state -> _apply_event(module, context, state, event) end)
   end
 
-  defp event_row_to_event(%EventRow{} = event_row) do
-    module = String.to_existing_atom(event_row.type)
+  defp row_to_event_and_context(%EventRow{} = row) do
+    module = String.to_existing_atom(row.type)
 
     # Workaround so that we have an struct (the keys are atoms) and not a map (the keys are strings)
-    {:ok, payload} =
-      event_row.payload
+    {:ok, event} =
+      row.payload
       |> Poison.encode()
       |> (fn {:ok, json} -> json end).()
       |> Poison.decode(as: struct!(module))
 
-    payload
+    {event, %Context{user_id: row.created_by}}
   end
 
-  defp _apply_event(module, state, event) do
-    state = module.apply_event(state, event)
+  defp _apply_event(module, context, state, event) do
+    state = module.apply_event(context, state, event)
     %{state | version: state.version + 1}
   end
 end

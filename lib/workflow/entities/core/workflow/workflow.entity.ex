@@ -10,20 +10,20 @@ defmodule Workflows.Core.WorkflowEntity do
   def get_entity_type(), do:  "workflow"
 
   @impl true
-  def handle_create(_context, id, args) do
+  def handle_create(_context, id, %{name: name}) do
     %CreateWorkflow{
       id: id,
-      name: args.name
+      name: name
     }
   end
 
   @impl true
-  def handle_action(%__MODULE__{} = _state, %SetName{name: name}) do
+  def handle_action(_context, %__MODULE__{} = _state, %SetName{name: name}) do
     %NameChanged{name: name}
   end
 
   @impl true
-  def handle_action(state, %CreateWorkflow{id: id, name: name}) do
+  def handle_action(_context, state, %CreateWorkflow{id: id, name: name}) do
     cond do
       is_nil(state) ->
         %WorkflowCreated{
@@ -37,7 +37,7 @@ defmodule Workflows.Core.WorkflowEntity do
   end
 
   @impl true
-  def apply_event(nil, %WorkflowCreated{} = event) do
+  def apply_event(_context, nil, %WorkflowCreated{} = event) do
     %__MODULE__{
       id: event.id,
       name: event.name,
@@ -46,7 +46,7 @@ defmodule Workflows.Core.WorkflowEntity do
   end
 
   @impl true
-  def apply_event(%__MODULE__{} = state, %NameChanged{name: name}) do
+  def apply_event(_context, %__MODULE__{} = state, %NameChanged{name: name}) do
     %{state | name: name}
   end
 end
