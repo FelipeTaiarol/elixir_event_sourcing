@@ -19,32 +19,36 @@ defmodule Workflows.Core.Workflow do
   end
 
   def create(context, %{name: name}) do
-    entity = %Entity{
-      version: 0,
-      type: "workflow"
-    }|> Repo.insert!
-    action = %CreateWorkflow{
-      id:  entity.id,
-      name: name
-    }
-    send_action(context, entity.id, action)
+    {:ok, result} = Repo.transaction(fn ->
+      entity = %Entity{
+        version: 0,
+        type: "workflow"
+      }|> Repo.insert!
+      action = %CreateWorkflow{
+        id:  entity.id,
+        name: name
+      }
+      send_action(context, entity.id, action)
+    end)
+    result
   end
 
   def send_action(context, id, action) do
-    IO.puts "send action #{inspect action}"
+    {:ok, result} = Repo.transaction(fn ->
+      snapshot = get_current_state(id);
+      current_version = get_version(snapshot)
 
-    snapshot = get_current_state(id);
-    current_version = get_version(snapshot)
+      event = dispatch_action(snapshot, action)
 
-    event = dispatch_action(snapshot, action)
+      action_row = persist_action(context, id, action)
 
-    action_row = persist_action(context, id, action)
+      persist_event(action_row, event, current_version + 1)
 
-    persist_event(action_row, event, current_version + 1)
+      update_entity_version(id, current_version + 1)
 
-    update_entity_version(id, current_version + 1)
-
-    _apply_event(snapshot, event)
+      _apply_event(snapshot, event)
+    end)
+    result
   end
 
   defp dispatch_action(state, %CreateWorkflow{id: id, name: name}) do
@@ -66,7 +70,6 @@ defmodule Workflows.Core.Workflow do
   end
 
   defp get_version(entity) do
-    IO.puts "get_version #{inspect entity}"
     cond do
       is_nil(entity) -> 0
       true -> entity.version
