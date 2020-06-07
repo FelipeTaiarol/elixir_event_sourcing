@@ -5,11 +5,12 @@ defmodule Workflows.Entities.Entity do
 
   schema "entities" do
     field :version, :integer
+    field :type, :string
     timestamps()
   end
 
   def changeset(entity, attrs) do
-    required_fields = [:version]
+    required_fields = [:version, :type]
     optional_fields = [];
     entity |> cast(attrs, required_fields ++ optional_fields)
   end
