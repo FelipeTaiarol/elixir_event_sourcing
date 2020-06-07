@@ -1,4 +1,4 @@
-defmodule Workflows.Entities.ActionRow do
+defmodule Entities.Entity.ActionRow do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "entities"

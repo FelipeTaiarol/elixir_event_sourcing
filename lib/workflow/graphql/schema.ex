@@ -1,7 +1,7 @@
 defmodule Workflows.Schema do
   use Absinthe.Schema
-  alias Workflows.Core.Workflow
   alias Workflows.Core.Workflow.Actions.{SetName}
+  alias Workflows.Core.WorkflowEntity
 
   query do
     @desc "Get Workflow"
@@ -9,15 +9,20 @@ defmodule Workflows.Schema do
       arg(:id, non_null(:integer))
 
       resolve(fn _, args, _ ->
-        data = Workflow.get(%{user_id: 1}, args.id)
+        data = WorkflowEntity.get(%{user_id: 1}, args.id)
         {:ok, data}
       end)
     end
 
-    # @desc "Get EntityRow EventRow"
-    # field :events, list_of(:event) do
-    #   resolve &Workflows.Entities.Resolver.get_events/3
-    # end
+    @desc "Get Workflow Entity"
+    field :workflow2, :workflow do
+      arg(:id, non_null(:integer))
+
+      resolve(fn _, args, _ ->
+        data = WorkflowEntity.get(%{user_id: 1}, args.id)
+        {:ok, data}
+      end)
+    end
   end
 
   mutation do
@@ -26,7 +31,7 @@ defmodule Workflows.Schema do
       arg(:name, non_null(:string))
 
       resolve(fn _, args, _ ->
-        data = Workflow.create(%{user_id: 1}, args)
+        data = WorkflowEntity.create(%{user_id: 1}, args)
         {:ok, data}
       end)
     end
@@ -38,7 +43,7 @@ defmodule Workflows.Schema do
 
       resolve(fn _, args, _ ->
         data =
-          Workflow.send_action(%{user_id: 1}, args.workflow_id, %SetName{
+          WorkflowEntity.send_action(%{user_id: 1}, args.workflow_id, %SetName{
             id: args.workflow_id,
             name: args.name
           })
