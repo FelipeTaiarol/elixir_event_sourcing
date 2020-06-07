@@ -1,9 +1,9 @@
 defmodule Workflows.Core.Workflow do
   import Ecto.Query
-  alias Workflows.Entities.{Event, Action, Entity}
+  alias Workflows.Entities.{EventRow, ActionRow, EntityRow}
   alias Workflows.Repo
-  alias Workflows.Core.Workflow.Actions.{CreateWorkflow, SetName}
-  alias Workflows.Core.Workflow.Events.{WorkflowCreated, NameChanged}
+  alias Workflows.Core.Workflow.ActionRows.{CreateWorkflow, SetName}
+  alias Workflows.Core.Workflow.EventRows.{WorkflowCreated, NameChanged}
 
   defstruct [:id, :name, :version]
 
@@ -21,7 +21,7 @@ defmodule Workflows.Core.Workflow do
     {:ok, result} =
       Repo.transaction(fn ->
         entity =
-          %Entity{
+          %EntityRow{
             version: 0,
             type: "workflow"
           }
@@ -42,6 +42,7 @@ defmodule Workflows.Core.Workflow do
     {:ok, result} =
       Repo.transaction(fn ->
         snapshot = get_current_state(id)
+
         current_version = get_version(snapshot)
 
         event = dispatch_action(snapshot, action)
@@ -87,10 +88,10 @@ defmodule Workflows.Core.Workflow do
   end
 
   defp get_current_state(id) do
-    Repo.get!(Entity, id)
+    Repo.get!(EntityRow, id)
 
     query =
-      from e in Event,
+      from e in EventRow,
         where: e.entity_id == ^id,
         order_by: e.entity_version,
         select: e
@@ -100,7 +101,7 @@ defmodule Workflows.Core.Workflow do
     |> Enum.reduce(nil, fn event, state -> _apply_event(state, event) end)
   end
 
-  def event_row_to_event(%Event{} = event_row) do
+  def event_row_to_event(%EventRow{} = event_row) do
     module = String.to_existing_atom(event_row.type)
 
     # Workaround so that we have an struct (the keys are atoms) and not a map (the keys are strings)
@@ -135,8 +136,8 @@ defmodule Workflows.Core.Workflow do
   end
 
   defp persist_action(context, entity_id, action) when is_integer(entity_id) do
-    %Action{}
-    |> Action.changeset(%{
+    %ActionRow{}
+    |> ActionRow.changeset(%{
       type: action.__struct__,
       payload: action,
       created_by: context.user_id,
@@ -146,9 +147,10 @@ defmodule Workflows.Core.Workflow do
     |> Repo.insert!()
   end
 
-  defp persist_event(%Action{} = action, event, entity_version) when is_integer(entity_version) do
-    %Event{}
-    |> Event.changeset(%{
+  defp persist_event(%ActionRow{} = action, event, entity_version)
+       when is_integer(entity_version) do
+    %EventRow{}
+    |> EventRow.changeset(%{
       action_id: action.id,
       created_by: action.created_by,
       entity_id: action.entity_id,
@@ -163,7 +165,7 @@ defmodule Workflows.Core.Workflow do
   defp update_entity_version(id, expected_version, new_version)
        when is_integer(id) and is_integer(expected_version) and is_integer(new_version) do
     query =
-      from e in Entity,
+      from e in EntityRow,
         where: e.id == ^id,
         update: [set: [version: ^new_version]]
 

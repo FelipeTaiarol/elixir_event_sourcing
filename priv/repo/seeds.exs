@@ -1,5 +1,5 @@
 alias Workflows.Core.Workflow
-alias Workflows.Core.Workflow.Actions.SetName
+alias Workflows.Core.Workflow.ActionRows.SetName
 
 context = %{
   user_id: 1
