@@ -12,6 +12,8 @@ defmodule Workflows.Application do
     children = [
       Workflows.Repo,
       Workflows.ReadModel.Repo,
+      Entities.EntityRegistry,
+      Entities.Supervisor,
       Workflows.Endpoint,
       supervisor(Absinthe.Subscription, [Workflows.Endpoint])
     ]

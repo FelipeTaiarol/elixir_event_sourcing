@@ -1,4 +1,3 @@
-
 defmodule Workflows.Core.WorkflowEntity do
   use Entities.Entity
   alias Workflows.Core.Workflow.Actions.{CreateWorkflow, SetName}

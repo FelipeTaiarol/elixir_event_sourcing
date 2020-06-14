@@ -3,7 +3,8 @@ defmodule Workflows.Schema.Resolver do
   alias Workflows.Core.WorkflowEntity
 
   def get_workflow(_, args, _) do
-    data = WorkflowEntity.get(%{user_id: 1}, args.id)
+    entity = Entities.Supervisor.entity_process(args.id, %{user_id: 1})
+    data = WorkflowEntity.get(entity, %{user_id: 1})
     {:ok, data}
   end
 
@@ -13,8 +14,10 @@ defmodule Workflows.Schema.Resolver do
   end
 
   def change_workflow_name(_, args, _) do
+    entity = Entities.Supervisor.entity_process(args.workflow_id, %{user_id: 1})
+
     data =
-      WorkflowEntity.send_action(%{user_id: 1}, args.workflow_id, %SetName{
+      WorkflowEntity.send_action(entity, %{user_id: 1}, %SetName{
         id: args.workflow_id,
         name: args.name
       })

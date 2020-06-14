@@ -29,7 +29,7 @@ defmodule CreateWorkflowTest do
   }
   """
 
-  test "createWorkflow mutation creates a workflow", %{conn: conn} do
+  test "workflows test", %{conn: conn} do
     conn =
       post(conn, "/api", %{
         "query" => @createWorkflow,
@@ -37,8 +37,8 @@ defmodule CreateWorkflowTest do
       })
 
     assert json_response(conn, 200) == %{
-      "data" => %{"createWorkflow" => %{"name" => "wf1", "id" => 1}}
-    }
+             "data" => %{"createWorkflow" => %{"name" => "wf1", "id" => 1}}
+           }
 
     conn =
       post(conn, "/api", %{
@@ -47,8 +47,8 @@ defmodule CreateWorkflowTest do
       })
 
     assert json_response(conn, 200) == %{
-      "data" => %{"changeWorkflowName" => %{"name" => "new_name", "id" => 1}}
-    }
+             "data" => %{"changeWorkflowName" => %{"name" => "new_name", "id" => 1}}
+           }
 
     conn =
       post(conn, "/api", %{
@@ -57,7 +57,7 @@ defmodule CreateWorkflowTest do
       })
 
     assert json_response(conn, 200) == %{
-      "data" => %{"workflow" => %{"name" => "new_name", "id" => 1, "version" => 2}}
-    }
+             "data" => %{"workflow" => %{"name" => "new_name", "id" => 1, "version" => 2}}
+           }
   end
 end

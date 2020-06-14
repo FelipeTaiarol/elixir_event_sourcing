@@ -25,17 +25,48 @@ defmodule Entities.Entity do
   defmacro __using__([]) do
     quote do
       @behaviour Entities.Entity
+      use GenServer
+
+      def start_link({entity_id, context}) do
+        IO.puts("Starting Entity #{inspect(__MODULE__)} #{entity_id} #{inspect(context)}")
+        GenServer.start_link(__MODULE__, {entity_id, context}, name: via_tuple(entity_id))
+      end
+
+      @impl GenServer
+      def init({entity_id, context}) do
+        state = Entities.Entity.get(__MODULE__, context, entity_id)
+        {:ok, state}
+      end
+
+      defp via_tuple(entity_id) do
+        Entities.EntityRegistry.via_tuple({__MODULE__, entity_id})
+      end
 
       def create(context, args) do
         Entities.Entity.create(__MODULE__, context, args)
       end
 
-      def get(context, id) when is_integer(id) do
-        Entities.Entity.get(__MODULE__, context, id)
+      def get(entity, context) when is_pid(entity) do
+        GenServer.call(entity, {:get, context})
       end
 
-      def send_action(context, id, action) do
-        Entities.Entity.send_action(__MODULE__, context, id, action)
+      def send_action(entity, context, action) when is_pid(entity) do
+        GenServer.call(entity, {:send_action, context, action})
+      end
+
+      @impk GenServer
+      def handle_call({:get, context}, _from, %{} = state) do
+        {:reply, state, state}
+      end
+
+      @impk GenServer
+      def handle_call(
+            {:send_action, context, action},
+            _from,
+            %{} = state
+          ) do
+        state = Entities.Entity.send_action(__MODULE__, context, state.id, state, action)
+        {:reply, state, state}
       end
 
       @doc false
@@ -67,19 +98,17 @@ defmodule Entities.Entity do
           }
           |> Repo.insert!()
 
-        action = module.handle_create(context, entity.id, args)
+        create_action = module.handle_create(context, entity.id, args)
 
-        send_action(module, context, entity.id, action)
+        send_action(module, context, entity.id, nil, create_action)
       end)
 
     result
   end
 
-  def send_action(module, context, id, action) do
+  def send_action(module, context, id, snapshot, action) do
     {:ok, result} =
       Repo.transaction(fn ->
-        snapshot = get(module, context, id)
-
         current_version = get_version(snapshot)
 
         event = module.handle_action(context, snapshot, action)
@@ -143,16 +172,30 @@ defmodule Entities.Entity do
 
   def get(module, _context, id) do
     Repo.get!(EntityRow, id)
+    get_state(module, nil, id)
+  end
+
+  def get_state(module, state, id) do
+    version = get_version(state)
 
     query =
       from e in EventRow,
-        where: e.entity_id == ^id,
+        where:
+          e.entity_id == ^id and
+            e.entity_version > ^version,
         order_by: e.entity_version,
         select: e
 
-    Repo.all(query)
+    events = Repo.all(query)
+    play_events(module, events, nil)
+  end
+
+  defp play_events(module, events, state) do
+    events
     |> Enum.map(&row_to_event_and_context/1)
-    |> Enum.reduce(nil, fn {event, context}, state -> _apply_event(module, context, state, event) end)
+    |> Enum.reduce(state, fn {event, context}, state ->
+      _apply_event(module, context, state, event)
+    end)
   end
 
   defp row_to_event_and_context(%EventRow{} = row) do
