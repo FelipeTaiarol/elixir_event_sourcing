@@ -9,10 +9,10 @@ defmodule Example.ShoppingList.CreateShoppingList do
   def handle_action(%Context{} = _context, state, %CreateShoppingList{id: id, name: name}) do
     cond do
       is_nil(state) ->
-        %ShoppingListCreated{
+        [%ShoppingListCreated{
           id: id,
           name: name
-        }
+        }]
 
       true ->
         raise "There is already a shopping_list with id #{id}"

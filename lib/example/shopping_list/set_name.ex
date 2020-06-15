@@ -5,7 +5,7 @@ defmodule Example.ShoppingList.SetName do
   alias Example.ShoppingListEntity
 
   def handle_action(%Context{} = _context, %ShoppingListEntity{} = _state, %SetName{name: name}) do
-    %NameChanged{name: name}
+    [%NameChanged{name: name}]
   end
 
   def apply_event(%Context{} = _context, %ShoppingListEntity{} = state, %NameChanged{

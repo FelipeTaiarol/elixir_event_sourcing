@@ -5,7 +5,7 @@ defmodule Entities.Entity do
   alias Entities.Context
 
   @doc """
-    Receives the current state of the Entity and an Action and it should return an Event
+    Receives the current state of the Entity and an Action and it should return a list of Events
   """
   @callback handle_action(context :: any, state :: any, action :: any) :: any
   @doc """
@@ -117,24 +117,38 @@ defmodule Entities.Entity do
   def send_action(module, %Context{} = context, id, state, action) when is_integer(id) do
     {:ok, result} =
       Repo.transaction(fn ->
-        current_version = get_version(state)
+        _send_action(module, context, id, state, action)
+      end)
+    result
+  end
 
-        event = module.handle_action(context, state, action)
+  defp _send_action(module, %Context{} = context, id, state, action) do
+    current_version = get_version(state)
 
-        action_row = persist_action(module, context, id, action)
+    action_row = persist_action(module, context, id, action)
 
-        persist_event(module, action_row, event, current_version + 1)
+    events = module.handle_action(context, state, action)
 
-        update_entity_version(id, current_version, current_version + 1)
-
-        final_state = _apply_event(module, context, state, event)
-
-        module.project_event(context, state, event, final_state)
-
-        final_state
+    final_state = events
+      |> Enum.with_index
+      |> Enum.reduce(state, fn({event, index}, state) ->
+        next_version = current_version + index + 1
+        process_event(module, context, state, action_row, event, next_version)
       end)
 
-    result
+    update_entity_version(id, current_version, current_version + Enum.count(events))
+
+    final_state
+  end
+
+  defp process_event(module, %Context{} = context, state, %ActionRow{} = action_row, event, next_version) do
+    persist_event(module, action_row, event, next_version)
+
+    final_state = _apply_event(module, context, state, event)
+
+    module.project_event(context, state, event, final_state)
+
+    final_state
   end
 
   defp get_version(entity) do
