@@ -1,27 +1,27 @@
 defmodule CreateWorkflowTest do
   use Example.ConnCase
 
-  @createWorkflow """
+  @createShoppingList """
   mutation ($name: String!) {
-    createWorkflow(name: $name) {
+    createShoppingList(name: $name) {
       id,
       name
     }
   }
   """
 
-  @changeWorkflowName """
-  mutation ($workflowId: Int!, $name: String!){
-    changeWorkflowName(workflowId: $workflowId, name: $name){
+  @changeShoppingListName """
+  mutation ($shoppingListId: Int!, $name: String!){
+    changeShoppingListName(shoppingListId: $shoppingListId, name: $name){
       id,
       name
     }
   }
   """
 
-  @workflow """
+  @shoppingList """
   query ($id: Int!){
-    workflow(id: $id){
+    shoppingList(id: $id){
       id,
       name,
       version
@@ -32,32 +32,32 @@ defmodule CreateWorkflowTest do
   test "workflows test", %{conn: conn} do
     conn =
       post(conn, "/api", %{
-        "query" => @createWorkflow,
+        "query" => @createShoppingList,
         "variables" => %{name: "wf1"}
       })
 
     assert json_response(conn, 200) == %{
-             "data" => %{"createWorkflow" => %{"name" => "wf1", "id" => 1}}
+             "data" => %{"createShoppingList" => %{"name" => "wf1", "id" => 1}}
            }
 
     conn =
       post(conn, "/api", %{
-        "query" => @changeWorkflowName,
-        "variables" => %{workflowId: 1, name: "new_name"}
+        "query" => @changeShoppingListName,
+        "variables" => %{shoppingListId: 1, name: "new_name"}
       })
 
     assert json_response(conn, 200) == %{
-             "data" => %{"changeWorkflowName" => %{"name" => "new_name", "id" => 1}}
+             "data" => %{"changeShoppingListName" => %{"name" => "new_name", "id" => 1}}
            }
 
     conn =
       post(conn, "/api", %{
-        "query" => @workflow,
+        "query" => @shoppingList,
         "variables" => %{id: 1}
       })
 
     assert json_response(conn, 200) == %{
-             "data" => %{"workflow" => %{"name" => "new_name", "id" => 1, "version" => 2}}
+             "data" => %{"shoppingList" => %{"name" => "new_name", "id" => 1, "version" => 2}}
            }
   end
 end

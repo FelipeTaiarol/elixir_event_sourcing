@@ -3,25 +3,25 @@ defmodule Example.Schema do
   alias Example.Schema.Resolver
 
   query do
-    @desc "Get Workflow"
-    field :workflow, :workflow do
+    @desc "Get a shopping list"
+    field :shopping_list, :shopping_list do
       arg(:id, non_null(:integer))
-      resolve(&Resolver.get_workflow/3)
+      resolve(&Resolver.get_shopping_list/3)
     end
   end
 
   mutation do
-    @desc "Create a Workflow"
-    field :create_workflow, :workflow do
+    @desc "Create a shopping list"
+    field :create_shopping_list, :shopping_list do
       arg(:name, non_null(:string))
-      resolve(&Resolver.create_workflow/3)
+      resolve(&Resolver.create_shopping_list/3)
     end
 
-    @desc "Change Workflow name"
-    field :change_workflow_name, :workflow do
-      arg(:workflow_id, non_null(:integer))
+    @desc "Change shopping list name"
+    field :change_shopping_list_name, :shopping_list do
+      arg(:shopping_list_id, non_null(:integer))
       arg(:name, non_null(:string))
-      resolve(&Resolver.change_workflow_name/3)
+      resolve(&Resolver.change_shopping_list_name/3)
     end
   end
 
@@ -37,19 +37,9 @@ defmodule Example.Schema do
     field :entity_version, non_null(:integer)
   end
 
-  object :workflow do
+  object :shopping_list do
     field :id, non_null(:integer)
     field :name, non_null(:string)
     field :version, non_null(:integer)
-  end
-
-  input_object :add_task do
-    field :type, non_null(:string)
-    field :payload, :add_task_payload
-  end
-
-  input_object :add_task_payload do
-    field :id, non_null(:string)
-    field :description, :string
   end
 end
