@@ -3,6 +3,7 @@ defmodule Entities.Entity do
   alias Entities.Entity.{EventRow, ActionRow, EntityRow}
   alias Example.Repo
   alias Entities.Context
+  alias Entities.EntityHelpers
 
   @doc """
     Receives the current state of the Entity and an Action and it should return a list of Events
@@ -99,19 +100,22 @@ defmodule Entities.Entity do
   def create(module, %Context{} = context, args) do
     {:ok, result} =
       Repo.transaction(fn ->
-        entity =
-          %EntityRow{
-            version: 0,
-            type: module.get_entity_type()
-          }
-          |> Repo.insert!()
-
-        create_action = module.handle_create(context, entity.id, args)
-
-        send_action(module, context, entity.id, nil, create_action)
+        _create(module, context, args)
       end)
-
     result
+  end
+
+  defp _create(module, %Context{} = context, args) do
+    entity =
+      %EntityRow{
+        version: 0,
+        type: module.get_entity_type()
+      }
+      |> Repo.insert!()
+
+    create_action = module.handle_create(context, entity.id, args)
+
+    send_action(module, context, entity.id, nil, create_action)
   end
 
   def send_action(module, %Context{} = context, id, state, action) when is_integer(id) do
@@ -123,9 +127,9 @@ defmodule Entities.Entity do
   end
 
   defp _send_action(module, %Context{} = context, id, state, action) do
-    current_version = get_version(state)
+    current_version = EntityHelpers.get_version(state)
 
-    action_row = persist_action(module, context, id, action)
+    action_row = EntityHelpers.persist_action(module, context, id, action)
 
     events = module.handle_action(context, state, action)
 
@@ -136,13 +140,13 @@ defmodule Entities.Entity do
         process_event(module, context, state, action_row, event, next_version)
       end)
 
-    update_entity_version(id, current_version, current_version + Enum.count(events))
+      EntityHelpers.update_entity_version(id, current_version, current_version + Enum.count(events))
 
     final_state
   end
 
   defp process_event(module, %Context{} = context, state, %ActionRow{} = action_row, event, next_version) do
-    persist_event(module, action_row, event, next_version)
+    EntityHelpers.persist_event(module, action_row, event, next_version)
 
     final_state = _apply_event(module, context, state, event)
 
@@ -151,59 +155,13 @@ defmodule Entities.Entity do
     final_state
   end
 
-  defp get_version(entity) do
-    cond do
-      is_nil(entity) -> 0
-      true -> entity.version
-    end
-  end
-
-  defp persist_action(module, %Context{} = context, entity_id, action)
-       when is_integer(entity_id) do
-    %ActionRow{}
-    |> ActionRow.changeset(%{
-      type: action.__struct__,
-      payload: action,
-      created_by: context.user_id,
-      entity_id: entity_id,
-      entity_type: module.get_entity_type()
-    })
-    |> Repo.insert!()
-  end
-
-  defp persist_event(module, %ActionRow{} = action, event, entity_version)
-       when is_integer(entity_version) do
-    %EventRow{}
-    |> EventRow.changeset(%{
-      action_id: action.id,
-      created_by: action.created_by,
-      entity_id: action.entity_id,
-      entity_type: module.get_entity_type(),
-      type: event.__struct__,
-      payload: event,
-      entity_version: entity_version
-    })
-    |> Repo.insert!()
-  end
-
-  defp update_entity_version(id, expected_version, new_version)
-       when is_integer(id) and is_integer(expected_version) and is_integer(new_version) do
-    query =
-      from e in EntityRow,
-        where: e.id == ^id,
-        update: [set: [version: ^new_version]]
-
-    # TODO: check expected version.
-    Repo.update_all(query, [])
-  end
-
   def get(module, _context, id) do
     Repo.get!(EntityRow, id)
     get_state(module, nil, id)
   end
 
   def get_state(module, state, id) do
-    version = get_version(state)
+    version = EntityHelpers.get_version(state)
 
     query =
       from e in EventRow,
@@ -219,23 +177,10 @@ defmodule Entities.Entity do
 
   defp play_events(module, events, state) do
     events
-    |> Enum.map(&row_to_event_and_context/1)
+    |> Enum.map(&EntityHelpers.row_to_event_and_context/1)
     |> Enum.reduce(state, fn {event, context}, state ->
       _apply_event(module, context, state, event)
     end)
-  end
-
-  defp row_to_event_and_context(%EventRow{} = row) do
-    module = String.to_existing_atom(row.type)
-
-    # Workaround so that we have an struct (the keys are atoms) and not a map (the keys are strings)
-    {:ok, event} =
-      row.payload
-      |> Poison.encode()
-      |> (fn {:ok, json} -> json end).()
-      |> Poison.decode(as: struct!(module))
-
-    {event, %Context{user_id: row.created_by}}
   end
 
   defp _apply_event(module, %Context{} = context, state, event) do
