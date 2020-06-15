@@ -29,7 +29,7 @@ defmodule CreateShoppingListTest do
   }
   """
 
-  test "workflows test", %{conn: conn} do
+  test "shopping_lists test", %{conn: conn} do
     conn =
       post(conn, "/api", %{
         "query" => @createShoppingList,

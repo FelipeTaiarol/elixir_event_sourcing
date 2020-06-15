@@ -1,9 +1,9 @@
-defmodule Example.ReadModel.Workflow do
+defmodule Example.ReadModel.ShoppingList do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "read"
 
-  schema "workflows" do
+  schema "shopping_lists" do
     field :name, :string
     timestamps()
   end

@@ -9,7 +9,7 @@ defmodule Example.Core.ShoppingListEntity do
   defstruct [:id, :name, :version]
 
   @impl true
-  def get_entity_type(), do: "workflow"
+  def get_entity_type(), do: "shopping_list"
 
   @impl true
   def handle_create(%Context{} = _context, id, %{name: name}) do

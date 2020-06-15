@@ -13,7 +13,7 @@ defmodule Example.Core.ShoppingList.CreateShoppingList do
         }
 
       true ->
-        raise "There is already a workflow with id #{id}"
+        raise "There is already a shopping_list with id #{id}"
     end
   end
 

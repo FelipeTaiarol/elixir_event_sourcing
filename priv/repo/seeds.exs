@@ -5,5 +5,5 @@ context = %{
   user_id: 1
 }
 
-workflow = Workflow.create(%{user_id: 1}, %{name: "workflow 1"})
-Workflow.send_action(context, workflow.id, %SetName{name: "new name"})
+shopping_list = ShoppingList.create(%{user_id: 1}, %{name: "shopping_list 1"})
+ShoppingList.send_action(context, shopping_list.id, %SetName{name: "new name"})

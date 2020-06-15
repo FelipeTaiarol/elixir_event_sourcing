@@ -36,7 +36,7 @@ defmodule Example.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_workflows",
+    key: "_shopping_lists",
     signing_salt: "shqjOspJ"
 
   plug Example.Router
