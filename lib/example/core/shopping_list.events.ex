@@ -1,5 +1,5 @@
-defmodule Example.Core.Workflow.Events do
-  defmodule WorkflowCreated do
+defmodule Example.Core.ShoppingList.Events do
+  defmodule ShoppingListCreated do
     defstruct [
       :id,
       :name

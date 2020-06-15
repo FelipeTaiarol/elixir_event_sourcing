@@ -1,10 +1,10 @@
-defmodule Example.Core.WorkflowEntity do
+defmodule Example.Core.ShoppingListEntity do
   use Entities.Entity
   alias Entities.Context
-  alias Example.Core.Workflow.Actions
-  alias Example.Core.Workflow.Events
-  alias Example.Core.Workflow.CreateWorkflow
-  alias Example.Core.Workflow.SetName
+  alias Example.Core.ShoppingList.Actions
+  alias Example.Core.ShoppingList.Events
+  alias Example.Core.ShoppingList.CreateShoppingList
+  alias Example.Core.ShoppingList.SetName
 
   defstruct [:id, :name, :version]
 
@@ -13,7 +13,7 @@ defmodule Example.Core.WorkflowEntity do
 
   @impl true
   def handle_create(%Context{} = _context, id, %{name: name}) do
-    %Actions.CreateWorkflow{
+    %Actions.CreateShoppingList{
       id: id,
       name: name
     }
@@ -24,12 +24,12 @@ defmodule Example.Core.WorkflowEntity do
     do: SetName.handle_action(context, state, event)
 
   @impl true
-  def handle_action(%Context{} = context, state, %Actions.CreateWorkflow{} = action),
-    do: CreateWorkflow.handle_action(context, state, action)
+  def handle_action(%Context{} = context, state, %Actions.CreateShoppingList{} = action),
+    do: CreateShoppingList.handle_action(context, state, action)
 
   @impl true
-  def apply_event(%Context{} = context, nil, %Events.WorkflowCreated{} = event),
-    do: CreateWorkflow.apply_event(context, nil, event)
+  def apply_event(%Context{} = context, nil, %Events.ShoppingListCreated{} = event),
+    do: CreateShoppingList.apply_event(context, nil, event)
 
   @impl true
   def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),

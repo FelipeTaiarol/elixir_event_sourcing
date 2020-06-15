@@ -1,4 +1,4 @@
-defmodule CreateWorkflowTest do
+defmodule CreateShoppingListTest do
   use Example.ConnCase
 
   @createShoppingList """

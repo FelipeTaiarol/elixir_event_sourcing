@@ -1,5 +1,5 @@
-alias Example.Core.Workflow
-alias Example.Core.Workflow.Actions.SetName
+alias Example.Core.ShoppingList
+alias Example.Core.ShoppingList.Actions.SetName
 
 context = %{
   user_id: 1

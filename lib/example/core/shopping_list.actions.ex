@@ -1,5 +1,5 @@
-defmodule Example.Core.Workflow.Actions do
-  defmodule CreateWorkflow do
+defmodule Example.Core.ShoppingList.Actions do
+  defmodule CreateShoppingList do
     defstruct [
       :id,
       :name

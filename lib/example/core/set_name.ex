@@ -1,22 +1,22 @@
-defmodule Example.Core.Workflow.SetName do
+defmodule Example.Core.ShoppingList.SetName do
   alias Entities.Context
-  alias Example.Core.Workflow.Actions.SetName
-  alias Example.Core.Workflow.Events.NameChanged
-  alias Example.Core.WorkflowEntity
+  alias Example.Core.ShoppingList.Actions.SetName
+  alias Example.Core.ShoppingList.Events.NameChanged
+  alias Example.Core.ShoppingListEntity
 
-  def handle_action(%Context{} = _context, %WorkflowEntity{} = _state, %SetName{name: name}) do
+  def handle_action(%Context{} = _context, %ShoppingListEntity{} = _state, %SetName{name: name}) do
     %NameChanged{name: name}
   end
 
-  def apply_event(%Context{} = _context, %WorkflowEntity{} = state, %NameChanged{
+  def apply_event(%Context{} = _context, %ShoppingListEntity{} = state, %NameChanged{
         name: name
       }) do
-    %WorkflowEntity{state | name: name}
+    %ShoppingListEntity{state | name: name}
   end
 
   def project_event(
         %Context{} = _context,
-        %WorkflowEntity{} = _state,
+        %ShoppingListEntity{} = _state,
         %NameChanged{} = event
       ) do
     IO.puts("PROJECT #{inspect(event)}")
