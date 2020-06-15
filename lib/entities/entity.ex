@@ -54,12 +54,12 @@ defmodule Entities.Entity do
         GenServer.call(entity, {:send_action, context, action})
       end
 
-      @impk GenServer
+      @impl GenServer
       def handle_call({:get, context}, _from, %{} = state) do
         {:reply, state, state}
       end
 
-      @impk GenServer
+      @impl GenServer
       def handle_call(
             {:send_action, context, action},
             _from,
@@ -88,7 +88,7 @@ defmodule Entities.Entity do
     end
   end
 
-  def create(module, context, args) do
+  def create(module, %Context{} = context, args) do
     {:ok, result} =
       Repo.transaction(fn ->
         entity =
@@ -106,7 +106,7 @@ defmodule Entities.Entity do
     result
   end
 
-  def send_action(module, context, id, snapshot, action) do
+  def send_action(module, %Context{} = context, id, snapshot, action) do
     {:ok, result} =
       Repo.transaction(fn ->
         current_version = get_version(snapshot)
@@ -132,7 +132,8 @@ defmodule Entities.Entity do
     end
   end
 
-  defp persist_action(module, context, entity_id, action) when is_integer(entity_id) do
+  defp persist_action(module, %Context{} = context, entity_id, action)
+       when is_integer(entity_id) do
     %ActionRow{}
     |> ActionRow.changeset(%{
       type: action.__struct__,
@@ -211,7 +212,7 @@ defmodule Entities.Entity do
     {event, %Context{user_id: row.created_by}}
   end
 
-  defp _apply_event(module, context, state, event) do
+  defp _apply_event(module, %Context{} = context, state, event) do
     state = module.apply_event(context, state, event)
     %{state | version: state.version + 1}
   end

@@ -12,17 +12,17 @@ defmodule Entities.Supervisor do
     }
   end
 
-  def entity_process(entity_id, context) do
-    case start_child(entity_id, context) do
+  def entity_process(entity_module, entity_id, context) do
+    case start_child(entity_module, entity_id, context) do
       {:ok, pid} -> pid
       {:error, {:already_started, pid}} -> pid
     end
   end
 
-  defp start_child(entity_id, context) do
+  defp start_child(entity_module, entity_id, context) do
     DynamicSupervisor.start_child(
       __MODULE__,
-      {Workflows.Core.WorkflowEntity, {entity_id, context}}
+      {entity_module, {entity_id, context}}
     )
   end
 end
