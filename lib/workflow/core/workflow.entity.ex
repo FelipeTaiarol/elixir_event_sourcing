@@ -1,8 +1,10 @@
 defmodule Workflows.Core.WorkflowEntity do
   use Entities.Entity
   alias Entities.Context
-  alias Workflows.Core.Workflow.Actions.{CreateWorkflow, SetName}
-  alias Workflows.Core.Workflow.Events.{WorkflowCreated, NameChanged}
+  alias Workflows.Core.Workflow.Actions
+  alias Workflows.Core.Workflow.Events
+  alias Workflows.Core.Workflow.CreateWorkflow
+  alias Workflows.Core.Workflow.SetName
 
   defstruct [:id, :name, :version]
 
@@ -11,42 +13,37 @@ defmodule Workflows.Core.WorkflowEntity do
 
   @impl true
   def handle_create(%Context{} = _context, id, %{name: name}) do
-    %CreateWorkflow{
+    %Actions.CreateWorkflow{
       id: id,
       name: name
     }
   end
 
   @impl true
-  def handle_action(%Context{} = _context, %__MODULE__{} = _state, %SetName{name: name}) do
-    %NameChanged{name: name}
-  end
+  def handle_action(%Context{} = context, %__MODULE__{} = state, %Actions.SetName{} = event),
+    do: SetName.handle_action(context, state, event)
 
   @impl true
-  def handle_action(%Context{} = _context, state, %CreateWorkflow{id: id, name: name}) do
-    cond do
-      is_nil(state) ->
-        %WorkflowCreated{
-          id: id,
-          name: name
-        }
-
-      true ->
-        raise "There is already a workflow with id #{id}"
-    end
-  end
+  def handle_action(%Context{} = context, state, %Actions.CreateWorkflow{} = action),
+    do: CreateWorkflow.handle_action(context, state, action)
 
   @impl true
-  def apply_event(%Context{} = _context, nil, %WorkflowCreated{} = event) do
-    %__MODULE__{
-      id: event.id,
-      name: event.name,
-      version: 0
-    }
-  end
+  def apply_event(%Context{} = context, nil, %Events.WorkflowCreated{} = event),
+    do: CreateWorkflow.apply_event(context, nil, event)
 
   @impl true
-  def apply_event(%Context{} = _context, %__MODULE__{} = state, %NameChanged{name: name}) do
-    %{state | name: name}
+  def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),
+    do: SetName.apply_event(context, state, event)
+
+  @impl true
+  def project_event(
+        %Context{} = context,
+        %__MODULE__{} = state,
+        %Events.NameChanged{} = event
+      ),
+      do: SetName.project_event(context, state, event)
+
+  @impl true
+  def project_event(%Context{} = _context, _state, _event) do
   end
 end

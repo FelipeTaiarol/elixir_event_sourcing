@@ -21,6 +21,10 @@ defmodule Entities.Entity do
     The Action will also be sent to handle_action/3
   """
   @callback handle_create(context :: any, id :: Integer.t(), args :: any) :: any
+  @doc """
+    Receives the current state of the Entity and an Event and it can project that event to a data store.
+  """
+  @callback project_event(context :: any, state :: any, event :: any) :: any
 
   defmacro __using__([]) do
     quote do
@@ -84,7 +88,11 @@ defmodule Entities.Entity do
         raise "apply_event/2 not implemented"
       end
 
-      defoverridable handle_action: 2, apply_event: 2, handle_create: 2
+      @doc false
+      def project_event(%Context{} = _context, _state, _event) do
+      end
+
+      defoverridable handle_action: 2, apply_event: 2, handle_create: 2, project_event: 3
     end
   end
 
@@ -106,12 +114,12 @@ defmodule Entities.Entity do
     result
   end
 
-  def send_action(module, %Context{} = context, id, snapshot, action) do
+  def send_action(module, %Context{} = context, id, state, action) when is_integer(id) do
     {:ok, result} =
       Repo.transaction(fn ->
-        current_version = get_version(snapshot)
+        current_version = get_version(state)
 
-        event = module.handle_action(context, snapshot, action)
+        event = module.handle_action(context, state, action)
 
         action_row = persist_action(module, context, id, action)
 
@@ -119,7 +127,11 @@ defmodule Entities.Entity do
 
         update_entity_version(id, current_version, current_version + 1)
 
-        _apply_event(module, context, snapshot, event)
+        final_state = _apply_event(module, context, state, event)
+
+        module.project_event(context, state, event)
+
+        final_state
       end)
 
     result
