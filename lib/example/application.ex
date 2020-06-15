@@ -11,7 +11,7 @@ defmodule Example.Application do
     # List all child processes to be supervised
     children = [
       Example.Repo,
-      Example.ReadModel.Repo,
+      Example.ReadModelRepo,
       Entities.EntityRegistry,
       Entities.Supervisor,
       Example.Endpoint,

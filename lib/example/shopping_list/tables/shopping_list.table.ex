@@ -1,4 +1,4 @@
-defmodule Example.ReadModel.ShoppingList do
+defmodule Example.ShoppingList.Tables.ShoppingList do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "read"
@@ -9,7 +9,7 @@ defmodule Example.ReadModel.ShoppingList do
   end
 
   def changeset(event, attrs) do
-    required_fields = [:name]
+    required_fields = [:id, :name]
     optional_fields = []
     event |> cast(attrs, required_fields ++ optional_fields)
   end

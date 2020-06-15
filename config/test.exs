@@ -20,7 +20,7 @@ config :example, Example.Repo,
   after_connect: {Postgrex, :query!, ["SET search_path TO entities;", []]},
   priv: "priv/repo/entities"
 
-config :example, Example.ReadModel.Repo,
+config :example, Example.ReadModelRepo,
   username: "postgres",
   password: "postgres",
   database: "shopping_lists_test",

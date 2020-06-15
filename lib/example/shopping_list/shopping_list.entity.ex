@@ -35,15 +35,21 @@ defmodule Example.ShoppingListEntity do
   def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),
     do: SetName.apply_event(context, state, event)
 
+    @impl true
+  def project_event(
+        %Context{} = context,
+        before_event,
+        %Events.ShoppingListCreated{} = event,
+        %__MODULE__{} = after_event
+      ),
+      do: CreateShoppingList.project_event(context, before_event, event, after_event)
+
   @impl true
   def project_event(
         %Context{} = context,
-        %__MODULE__{} = state,
-        %Events.NameChanged{} = event
+        %__MODULE__{} = before_event,
+        %Events.NameChanged{} = event,
+        %__MODULE__{} = after_event
       ),
-      do: SetName.project_event(context, state, event)
-
-  @impl true
-  def project_event(%Context{} = _context, _state, _event) do
-  end
+      do: SetName.project_event(context, before_event, event, after_event)
 end

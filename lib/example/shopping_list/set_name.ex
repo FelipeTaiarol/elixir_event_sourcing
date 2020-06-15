@@ -16,9 +16,9 @@ defmodule Example.ShoppingList.SetName do
 
   def project_event(
         %Context{} = _context,
-        %ShoppingListEntity{} = _state,
-        %NameChanged{} = event
+        %ShoppingListEntity{} = _before_event,
+        %NameChanged{} = _event,
+        %ShoppingListEntity{} = _after_event
       ) do
-    IO.puts("PROJECT #{inspect(event)}")
   end
 end

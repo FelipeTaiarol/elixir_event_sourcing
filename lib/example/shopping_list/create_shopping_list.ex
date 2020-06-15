@@ -3,6 +3,8 @@ defmodule Example.ShoppingList.CreateShoppingList do
   alias Example.ShoppingList.Actions.CreateShoppingList
   alias Example.ShoppingList.Events.ShoppingListCreated
   alias Example.ShoppingListEntity
+  alias Example.ShoppingList.Tables
+  alias Example.Repo
 
   def handle_action(%Context{} = _context, state, %CreateShoppingList{id: id, name: name}) do
     cond do
@@ -27,9 +29,12 @@ defmodule Example.ShoppingList.CreateShoppingList do
 
   def project_event(
         %Context{} = _context,
-        %ShoppingListEntity{} = _state,
-        %ShoppingListCreated{} = event
+        _before_event,
+        %ShoppingListCreated{} = _event,
+        %ShoppingListEntity{} = after_event
       ) do
-    IO.puts("PROJECT #{inspect(event)}")
+    %Tables.ShoppingList{}
+    |> Tables.ShoppingList.changeset(%{id: after_event.id, name: after_event.name})
+    |> Repo.insert!()
   end
 end

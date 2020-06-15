@@ -9,14 +9,12 @@ defmodule Example.Repo.Migrations.ReadModel do
 
     create(unique_index(:entity_sync_state, [:entity_id], prefix: "read"))
 
-    create table(:example, prefix: "read") do
+    create table(:shopping_lists, prefix: "read", primary_key: false) do
+      add(:id, :integer, null: false, primary_key: true)
       add(:name, :string, null: false)
+      timestamps()
     end
 
-    create(unique_index(:example, [:name], prefix: "read"))
-
-    create table(:tasks, prefix: "read") do
-      add(:description, :string, null: false)
-    end
+    create(unique_index(:shopping_lists, [:name], prefix: "read"))
   end
 end

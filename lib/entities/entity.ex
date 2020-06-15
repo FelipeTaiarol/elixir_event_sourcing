@@ -22,9 +22,10 @@ defmodule Entities.Entity do
   """
   @callback handle_create(context :: any, id :: Integer.t(), args :: any) :: any
   @doc """
-    Receives the current state of the Entity and an Event and it can project that event to a data store.
+    Receives the state of the Entity before the event, the Event and the state of the Entity after the Event.
+    It can project that event to a data store.
   """
-  @callback project_event(context :: any, state :: any, event :: any) :: any
+  @callback project_event(context :: any, before_event :: any, event :: any, before_event :: any) :: any
 
   defmacro __using__([]) do
     quote do
@@ -32,7 +33,6 @@ defmodule Entities.Entity do
       use GenServer
 
       def start_link({entity_id, context}) do
-        IO.puts("Starting Entity #{inspect(__MODULE__)} #{entity_id} #{inspect(context)}")
         GenServer.start_link(__MODULE__, {entity_id, context}, name: via_tuple(entity_id))
       end
 
@@ -89,10 +89,10 @@ defmodule Entities.Entity do
       end
 
       @doc false
-      def project_event(%Context{} = _context, _state, _event) do
+      def project_event(%Context{} = _context, _before_event, _event, _after_event) do
       end
 
-      defoverridable handle_action: 2, apply_event: 2, handle_create: 2, project_event: 3
+      defoverridable handle_action: 2, apply_event: 2, handle_create: 2, project_event: 4
     end
   end
 
@@ -129,7 +129,7 @@ defmodule Entities.Entity do
 
         final_state = _apply_event(module, context, state, event)
 
-        module.project_event(context, state, event)
+        module.project_event(context, state, event, final_state)
 
         final_state
       end)

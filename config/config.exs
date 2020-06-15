@@ -13,7 +13,7 @@ config :cors_plug,
   methods: ["GET", "POST"]
 
 config :example,
-  ecto_repos: [Example.Repo, Example.ReadModel.Repo]
+  ecto_repos: [Example.Repo, Example.ReadModelRepo]
 
 # Configures the endpoint
 config :example, Example.Endpoint,
