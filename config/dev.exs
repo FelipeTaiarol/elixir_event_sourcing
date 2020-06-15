@@ -1,6 +1,6 @@
 use Mix.Config
 
-config :workflows, Example.Endpoint,
+config :example, Example.Endpoint,
   http: [port: 4000],
   debug_errors: false,
   code_reloader: true,
@@ -26,7 +26,7 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
-config :workflows, Example.Repo,
+config :example, Example.Repo,
   username: "postgres",
   password: "postgres",
   database: "workflows",
@@ -35,7 +35,7 @@ config :workflows, Example.Repo,
   after_connect: {Postgrex, :query!, ["SET search_path TO entities;", []]},
   priv: "priv/repo/entities"
 
-config :workflows, Example.ReadModel.Repo,
+config :example, Example.ReadModel.Repo,
   username: "postgres",
   password: "postgres",
   database: "workflows",

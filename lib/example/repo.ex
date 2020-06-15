@@ -1,5 +1,5 @@
 defmodule Example.Repo do
   use Ecto.Repo,
-    otp_app: :workflows,
+    otp_app: :example,
     adapter: Ecto.Adapters.Postgres
 end

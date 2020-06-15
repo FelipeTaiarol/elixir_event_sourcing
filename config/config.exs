@@ -12,11 +12,11 @@ config :cors_plug,
   max_age: 86400,
   methods: ["GET", "POST"]
 
-config :workflows,
+config :example,
   ecto_repos: [Example.Repo, Example.ReadModel.Repo]
 
 # Configures the endpoint
-config :workflows, Example.Endpoint,
+config :example, Example.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "r/KECNh6PcQMEwqy78veF/hGvvy+MAiOa9fL2tbURvl4D4K3FZiF4p8zwesH9+dW",
   render_errors: [view: Example.ErrorView, accepts: ~w(json)],

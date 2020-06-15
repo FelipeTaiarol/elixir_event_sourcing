@@ -1,3 +1,3 @@
 defmodule Example.Gettext do
-  use Gettext, otp_app: :workflows
+  use Gettext, otp_app: :example
 end

@@ -9,11 +9,11 @@ defmodule Example.Repo.Migrations.ReadModel do
 
     create(unique_index(:entity_sync_state, [:entity_id], prefix: "read"))
 
-    create table(:workflows, prefix: "read") do
+    create table(:example, prefix: "read") do
       add(:name, :string, null: false)
     end
 
-    create(unique_index(:workflows, [:name], prefix: "read"))
+    create(unique_index(:example, [:name], prefix: "read"))
 
     create table(:tasks, prefix: "read") do
       add(:description, :string, null: false)

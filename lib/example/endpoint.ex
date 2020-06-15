@@ -1,5 +1,5 @@
 defmodule Example.Endpoint do
-  use Phoenix.Endpoint, otp_app: :workflows
+  use Phoenix.Endpoint, otp_app: :example
   use Absinthe.Phoenix.Endpoint
 
   plug CORSPlug
@@ -10,7 +10,7 @@ defmodule Example.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :workflows,
+    from: :example,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
