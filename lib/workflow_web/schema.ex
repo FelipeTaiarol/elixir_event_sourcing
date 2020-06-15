@@ -1,8 +1,6 @@
 defmodule Workflows.Schema do
   use Absinthe.Schema
   alias Workflows.Schema.Resolver
-  alias Workflows.Core.Workflow.Actions.{SetName}
-  alias Workflows.Core.WorkflowEntity
 
   query do
     @desc "Get Workflow"

@@ -13,13 +13,13 @@ defmodule Workflows.Schema.Resolver do
     {:ok, data}
   end
 
-  def change_workflow_name(_, args, _) do
-    entity = Entities.Supervisor.entity_process(args.workflow_id, %{user_id: 1})
+  def change_workflow_name(_, %{workflow_id: workflow_id, name: name}, _) do
+    entity = Entities.Supervisor.entity_process(workflow_id, %{user_id: 1})
 
     data =
       WorkflowEntity.send_action(entity, %{user_id: 1}, %SetName{
-        id: args.workflow_id,
-        name: args.name
+        id: workflow_id,
+        name: name
       })
 
     {:ok, data}
