@@ -4,36 +4,34 @@ defmodule Example.Schema.Resolver do
   alias Entities.Context
 
   def get_shopping_list(_, args, _) do
-    entity =
-      Entities.Supervisor.entity_process(Example.ShoppingListEntity, args.id, %Context{
-        user_id: 1
-      })
-
-    data = ShoppingListEntity.get(entity, %Context{user_id: 1})
+    context = %Context{user_id: 1}
+    data = shopping_list_process(args.id, context)
+      |> ShoppingListEntity.get(context)
     {:ok, data}
   end
 
   def create_shopping_list(_, args, _) do
-    data = ShoppingListEntity.create(%Context{user_id: 1}, args)
+    context = %Context{user_id: 1}
+    data = ShoppingListEntity.create(context, args)
     {:ok, data}
   end
 
   def change_shopping_list_name(_, %{shopping_list_id: shopping_list_id, name: name}, _) do
-    entity =
-      Entities.Supervisor.entity_process(
-        Example.ShoppingListEntity,
-        shopping_list_id,
-        %Context{
-          user_id: 1
-        }
-      )
-
-    data =
-      ShoppingListEntity.send_action(entity, %Context{user_id: 1}, %SetName{
-        id: shopping_list_id,
-        name: name
-      })
-
+    context = %Context{user_id: 1}
+    action = %SetName{
+      id: shopping_list_id,
+      name: name
+    }
+    data = shopping_list_process(shopping_list_id, context)
+      |> ShoppingListEntity.send_action(context, action)
     {:ok, data}
+  end
+
+  defp shopping_list_process(shopping_list_id, context) do
+    Entities.Supervisor.entity_process(
+      Example.ShoppingListEntity,
+      shopping_list_id,
+      context
+    )
   end
 end
