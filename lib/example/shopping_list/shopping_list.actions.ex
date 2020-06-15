@@ -1,4 +1,4 @@
-defmodule Example.Core.ShoppingList.Actions do
+defmodule Example.ShoppingList.Actions do
   defmodule CreateShoppingList do
     defstruct [
       :id,

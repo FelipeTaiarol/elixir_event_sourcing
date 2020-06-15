@@ -1,4 +1,4 @@
-defmodule Example.Core.ShoppingList.Events do
+defmodule Example.ShoppingList.Events do
   defmodule ShoppingListCreated do
     defstruct [
       :id,

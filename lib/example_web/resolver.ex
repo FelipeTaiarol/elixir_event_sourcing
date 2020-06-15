@@ -1,11 +1,11 @@
 defmodule Example.Schema.Resolver do
-  alias Example.Core.ShoppingList.Actions.{SetName}
-  alias Example.Core.ShoppingListEntity
+  alias Example.ShoppingList.Actions.{SetName}
+  alias Example.ShoppingListEntity
   alias Entities.Context
 
   def get_shopping_list(_, args, _) do
     entity =
-      Entities.Supervisor.entity_process(Example.Core.ShoppingListEntity, args.id, %Context{
+      Entities.Supervisor.entity_process(Example.ShoppingListEntity, args.id, %Context{
         user_id: 1
       })
 
@@ -21,7 +21,7 @@ defmodule Example.Schema.Resolver do
   def change_shopping_list_name(_, %{shopping_list_id: shopping_list_id, name: name}, _) do
     entity =
       Entities.Supervisor.entity_process(
-        Example.Core.ShoppingListEntity,
+        Example.ShoppingListEntity,
         shopping_list_id,
         %Context{
           user_id: 1

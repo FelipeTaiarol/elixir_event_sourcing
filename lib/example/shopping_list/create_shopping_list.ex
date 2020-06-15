@@ -1,8 +1,8 @@
-defmodule Example.Core.ShoppingList.CreateShoppingList do
+defmodule Example.ShoppingList.CreateShoppingList do
   alias Entities.Context
-  alias Example.Core.ShoppingList.Actions.CreateShoppingList
-  alias Example.Core.ShoppingList.Events.ShoppingListCreated
-  alias Example.Core.ShoppingListEntity
+  alias Example.ShoppingList.Actions.CreateShoppingList
+  alias Example.ShoppingList.Events.ShoppingListCreated
+  alias Example.ShoppingListEntity
 
   def handle_action(%Context{} = _context, state, %CreateShoppingList{id: id, name: name}) do
     cond do

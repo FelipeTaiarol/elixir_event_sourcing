@@ -1,10 +1,10 @@
-defmodule Example.Core.ShoppingListEntity do
+defmodule Example.ShoppingListEntity do
   use Entities.Entity
   alias Entities.Context
-  alias Example.Core.ShoppingList.Actions
-  alias Example.Core.ShoppingList.Events
-  alias Example.Core.ShoppingList.CreateShoppingList
-  alias Example.Core.ShoppingList.SetName
+  alias Example.ShoppingList.Actions
+  alias Example.ShoppingList.Events
+  alias Example.ShoppingList.CreateShoppingList
+  alias Example.ShoppingList.SetName
 
   defstruct [:id, :name, :version]
 

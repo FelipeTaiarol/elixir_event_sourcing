@@ -1,5 +1,5 @@
-alias Example.Core.ShoppingList
-alias Example.Core.ShoppingList.Actions.SetName
+alias Example.ShoppingList
+alias Example.ShoppingList.Actions.SetName
 
 context = %{
   user_id: 1

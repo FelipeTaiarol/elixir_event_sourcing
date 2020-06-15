@@ -1,8 +1,8 @@
-defmodule Example.Core.ShoppingList.SetName do
+defmodule Example.ShoppingList.SetName do
   alias Entities.Context
-  alias Example.Core.ShoppingList.Actions.SetName
-  alias Example.Core.ShoppingList.Events.NameChanged
-  alias Example.Core.ShoppingListEntity
+  alias Example.ShoppingList.Actions.SetName
+  alias Example.ShoppingList.Events.NameChanged
+  alias Example.ShoppingListEntity
 
   def handle_action(%Context{} = _context, %ShoppingListEntity{} = _state, %SetName{name: name}) do
     %NameChanged{name: name}
