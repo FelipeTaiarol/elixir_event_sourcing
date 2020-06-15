@@ -1,4 +1,4 @@
-defmodule Workflows.ReadModel.Workflow do
+defmodule Example.ReadModel.Workflow do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "read"

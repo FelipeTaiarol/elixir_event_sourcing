@@ -1,8 +1,8 @@
-defmodule Workflows.Core.Workflow.SetName do
+defmodule Example.Core.Workflow.SetName do
   alias Entities.Context
-  alias Workflows.Core.Workflow.Actions.SetName
-  alias Workflows.Core.Workflow.Events.NameChanged
-  alias Workflows.Core.WorkflowEntity
+  alias Example.Core.Workflow.Actions.SetName
+  alias Example.Core.Workflow.Events.NameChanged
+  alias Example.Core.WorkflowEntity
 
   def handle_action(%Context{} = _context, %WorkflowEntity{} = _state, %SetName{name: name}) do
     %NameChanged{name: name}

@@ -1,4 +1,4 @@
-defmodule Workflows.Router do
+defmodule Example.Router do
   use Phoenix.Router
   import Phoenix.Controller
 
@@ -9,8 +9,8 @@ defmodule Workflows.Router do
   scope "/" do
     pipe_through :api
 
-    forward "/api", Absinthe.Plug, schema: Workflows.Schema
+    forward "/api", Absinthe.Plug, schema: Example.Schema
 
-    forward "/graphiql", Absinthe.Plug.GraphiQL, schema: Workflows.Schema
+    forward "/graphiql", Absinthe.Plug.GraphiQL, schema: Example.Schema
   end
 end

@@ -1,5 +1,5 @@
 defmodule CreateWorkflowTest do
-  use Workflows.ConnCase
+  use Example.ConnCase
 
   @createWorkflow """
   mutation ($name: String!) {

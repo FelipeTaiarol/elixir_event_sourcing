@@ -1,4 +1,4 @@
-defmodule Workflows.ReadModel.EntitySyncState do
+defmodule Example.ReadModel.EntitySyncState do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "read"

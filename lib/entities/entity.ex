@@ -1,7 +1,7 @@
 defmodule Entities.Entity do
   import Ecto.Query
   alias Entities.Entity.{EventRow, ActionRow, EntityRow}
-  alias Workflows.Repo
+  alias Example.Repo
   alias Entities.Context
 
   @doc """

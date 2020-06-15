@@ -1,4 +1,4 @@
-alias Workflows.Repo
+alias Example.Repo
 
 Ecto.Adapters.SQL.query!(Repo, """
   drop schema if exists entities cascade;

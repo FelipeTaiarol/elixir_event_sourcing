@@ -1,8 +1,8 @@
-defmodule Workflows.Core.Workflow.CreateWorkflow do
+defmodule Example.Core.Workflow.CreateWorkflow do
   alias Entities.Context
-  alias Workflows.Core.Workflow.Actions.CreateWorkflow
-  alias Workflows.Core.Workflow.Events.WorkflowCreated
-  alias Workflows.Core.WorkflowEntity
+  alias Example.Core.Workflow.Actions.CreateWorkflow
+  alias Example.Core.Workflow.Events.WorkflowCreated
+  alias Example.Core.WorkflowEntity
 
   def handle_action(%Context{} = _context, state, %CreateWorkflow{id: id, name: name}) do
     cond do

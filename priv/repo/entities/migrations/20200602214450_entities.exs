@@ -1,4 +1,4 @@
-defmodule Workflows.Repo.Migrations.Entities do
+defmodule Example.Repo.Migrations.Entities do
   use Ecto.Migration
 
   def change do

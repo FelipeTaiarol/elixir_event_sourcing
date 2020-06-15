@@ -1,4 +1,4 @@
-defmodule Workflows.MixProject do
+defmodule Example.MixProject do
   use Mix.Project
 
   def project do
@@ -19,7 +19,7 @@ defmodule Workflows.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Workflows.Application, []},
+      mod: {Example.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

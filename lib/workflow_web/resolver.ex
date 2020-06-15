@@ -1,11 +1,11 @@
-defmodule Workflows.Schema.Resolver do
-  alias Workflows.Core.Workflow.Actions.{SetName}
-  alias Workflows.Core.WorkflowEntity
+defmodule Example.Schema.Resolver do
+  alias Example.Core.Workflow.Actions.{SetName}
+  alias Example.Core.WorkflowEntity
   alias Entities.Context
 
   def get_workflow(_, args, _) do
     entity =
-      Entities.Supervisor.entity_process(Workflows.Core.WorkflowEntity, args.id, %Context{
+      Entities.Supervisor.entity_process(Example.Core.WorkflowEntity, args.id, %Context{
         user_id: 1
       })
 
@@ -20,7 +20,7 @@ defmodule Workflows.Schema.Resolver do
 
   def change_workflow_name(_, %{workflow_id: workflow_id, name: name}, _) do
     entity =
-      Entities.Supervisor.entity_process(Workflows.Core.WorkflowEntity, workflow_id, %Context{
+      Entities.Supervisor.entity_process(Example.Core.WorkflowEntity, workflow_id, %Context{
         user_id: 1
       })
 

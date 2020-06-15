@@ -1,6 +1,6 @@
-defmodule Workflows.Schema do
+defmodule Example.Schema do
   use Absinthe.Schema
-  alias Workflows.Schema.Resolver
+  alias Example.Schema.Resolver
 
   query do
     @desc "Get Workflow"

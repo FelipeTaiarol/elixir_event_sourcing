@@ -1,4 +1,4 @@
-defmodule Workflows.Core.Workflow.Events do
+defmodule Example.Core.Workflow.Events do
   defmodule WorkflowCreated do
     defstruct [
       :id,

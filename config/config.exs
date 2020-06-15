@@ -13,14 +13,14 @@ config :cors_plug,
   methods: ["GET", "POST"]
 
 config :workflows,
-  ecto_repos: [Workflows.Repo, Workflows.ReadModel.Repo]
+  ecto_repos: [Example.Repo, Example.ReadModel.Repo]
 
 # Configures the endpoint
-config :workflows, Workflows.Endpoint,
+config :workflows, Example.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "r/KECNh6PcQMEwqy78veF/hGvvy+MAiOa9fL2tbURvl4D4K3FZiF4p8zwesH9+dW",
-  render_errors: [view: Workflows.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Workflows.PubSub, adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: Example.ErrorView, accepts: ~w(json)],
+  pubsub: [name: Example.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,

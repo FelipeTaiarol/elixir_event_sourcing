@@ -1,10 +1,10 @@
-defmodule Workflows.Core.WorkflowEntity do
+defmodule Example.Core.WorkflowEntity do
   use Entities.Entity
   alias Entities.Context
-  alias Workflows.Core.Workflow.Actions
-  alias Workflows.Core.Workflow.Events
-  alias Workflows.Core.Workflow.CreateWorkflow
-  alias Workflows.Core.Workflow.SetName
+  alias Example.Core.Workflow.Actions
+  alias Example.Core.Workflow.Events
+  alias Example.Core.Workflow.CreateWorkflow
+  alias Example.Core.Workflow.SetName
 
   defstruct [:id, :name, :version]
 

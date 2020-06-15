@@ -1,4 +1,4 @@
-defmodule Workflows.ReadModel.Repo do
+defmodule Example.ReadModel.Repo do
   use Ecto.Repo,
     otp_app: :workflows,
     adapter: Ecto.Adapters.Postgres

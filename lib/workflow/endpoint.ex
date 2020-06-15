@@ -1,4 +1,4 @@
-defmodule Workflows.Endpoint do
+defmodule Example.Endpoint do
   use Phoenix.Endpoint, otp_app: :workflows
   use Absinthe.Phoenix.Endpoint
 
@@ -39,5 +39,5 @@ defmodule Workflows.Endpoint do
     key: "_workflows",
     signing_salt: "shqjOspJ"
 
-  plug Workflows.Router
+  plug Example.Router
 end
