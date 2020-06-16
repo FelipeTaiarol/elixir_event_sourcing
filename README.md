@@ -88,7 +88,7 @@ This is the public API of every Entity:
 
 It receives the request context and arguments and it creates an instance of that Entity.
 
-ps: **context** has always a hardcoded for now. It will have information such as the userId and the requestId in the future.  
+ps: **context** has always a hardcoded value for now. It will have information such as the userId and the requestId in the future.  
 
 **def get(entity, context) when is_pid(entity)**.  
 
