@@ -38,7 +38,12 @@ defmodule Entities.Entity do
   defmacro __using__([]) do
     quote do
       @behaviour Entities.Entity
-      use GenServer
+      @cache_check_interval 5000 # in milliseconds
+      @cache_invalidation_time 60 # in seconds
+
+      # The process will stop itself if the Entity was not accessed in more than @cache_invalidation_time.
+      # If the process crashes for another reason, the Entity Supervisor will start a new one the next time the Entity is accessed.
+      use GenServer, restart: :temporary
 
       def start_link({entity_id, context}) do
         GenServer.start_link(__MODULE__, {entity_id, context}, name: via_tuple(entity_id))
@@ -46,6 +51,7 @@ defmodule Entities.Entity do
 
       @impl GenServer
       def init({entity_id, context}) do
+        Process.send_after(self(), :maybe_stop_process, @cache_check_interval)
         state = %Cache{
           entity: Entities.Entity.get(__MODULE__, context, entity_id),
           last_accessed_at: DateTime.utc_now()
@@ -84,6 +90,18 @@ defmodule Entities.Entity do
         entity = Entities.Entity.send_action(__MODULE__, context, state.entity.id, state.entity, action)
         new_cache = %Cache{state | last_accessed_at: DateTime.utc_now(), entity: entity }
         {:reply, entity, new_cache}
+      end
+
+      @impl GenServer
+      def handle_info(:maybe_stop_process, %Cache{} = state) do
+        Process.send_after(self(), :maybe_stop_process, @cache_check_interval)
+
+        limit = DateTime.add(state.last_accessed_at, @cache_invalidation_time, :second)
+        diff = DateTime.diff(limit, DateTime.utc_now())
+        cond do
+          diff < 0 -> {:stop, :normal, state}
+          true -> {:noreply, state}
+        end
       end
 
       @doc false
