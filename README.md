@@ -77,4 +77,23 @@ This is the only option you have if your event log is persisted to Kafka or some
   end
 ```
 
+**handle_create(context :: any, id :: Integer.t(), args :: any) :: any**. 
+It receives the Entity ID and arguments and it should return an action. This action will be later sent to **handle_action**. The **args** parameters is the same that was passed to the **create** function (see below). The **id** will be generated when the **create** function is called.  
+
+### Entity API and Guarantees
+
+To find a 
+
+```elixir
+defp shopping_list_process(shopping_list_id, context) do
+  Entities.Supervisor.entity_process(
+    Example.ShoppingListEntity,
+    shopping_list_id,
+    context
+  )
+end
+```
+
+  1. The 
+
 
