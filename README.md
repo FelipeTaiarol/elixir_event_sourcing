@@ -124,13 +124,35 @@ Check the [resolvers](https://github.com/FelipeTaiarol/elixir_event_sourcing/blo
 
 ### Entities Database Schema 
 
-```elixir
-    create table(:entities, prefix: "entities") do
-      add(:version, :bigint, null: false)
-      add(:type, :string, null: false)
-      timestamps()
-    end
+The **entities** table will have one row per Entity, it has the information about what is the current **version** of that Entity, i.e. the number of events that were persisted for that Entity.  
 
+```elixir
+  create table(:entities, prefix: "entities") do
+    add(:version, :bigint, null: false)
+    add(:type, :string, null: false)
+    timestamps()
+  end
+```
+
+The **entity_events** has one row per event. The **entity_version** column is the **version** the Entity was when that event was persisted.  
+
+```elixir
+  create table(:entity_events, prefix: "entities") do
+    add(:entity_id, references(:entities), null: false)
+    add(:entity_type, :string, null: false)
+    add(:entity_version, :bigint, null: false)
+    add(:type, :string, null: false)
+    add(:payload, :map, null: false)
+    add(:created_by, :bigint, null: false)
+    add(:action_id, references(:entity_actions), null: false)
+    timestamps()
+  end
+
+  create(unique_index(:entity_events, [:entity_id, :entity_version], prefix: "entities"))
+```
+
+The **entity_actions** table is used for only for debugging. It is often useful to know what was the action that generated a given event.  
+```elixir
     create table(:entity_actions, prefix: "entities") do
       add(:entity_id, references(:entities), null: false)
       add(:entity_type, :string, null: false)
@@ -139,19 +161,6 @@ Check the [resolvers](https://github.com/FelipeTaiarol/elixir_event_sourcing/blo
       add(:created_by, :bigint, null: false)
       timestamps()
     end
-
-    create table(:entity_events, prefix: "entities") do
-      add(:entity_id, references(:entities), null: false)
-      add(:entity_type, :string, null: false)
-      add(:entity_version, :bigint, null: false)
-      add(:type, :string, null: false)
-      add(:payload, :map, null: false)
-      add(:created_by, :bigint, null: false)
-      add(:action_id, references(:entity_actions), null: false)
-      timestamps()
-    end
-
-    create(unique_index(:entity_events, [:entity_id, :entity_version], prefix: "entities"))
 ```
 
 
