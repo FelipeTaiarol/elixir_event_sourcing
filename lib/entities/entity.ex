@@ -5,6 +5,13 @@ defmodule Entities.Entity do
   alias Entities.Context
   alias Entities.EntityHelpers
 
+  defmodule Cache do
+    defstruct [
+      :last_accessed_at,
+      :entity
+    ]
+  end
+
   @doc """
     Receives the current state of the Entity and an Action and it should return a list of Events
   """
@@ -39,7 +46,10 @@ defmodule Entities.Entity do
 
       @impl GenServer
       def init({entity_id, context}) do
-        state = Entities.Entity.get(__MODULE__, context, entity_id)
+        state = %Cache{
+          entity: Entities.Entity.get(__MODULE__, context, entity_id),
+          last_accessed_at: DateTime.utc_now()
+        }
         {:ok, state}
       end
 
@@ -60,18 +70,20 @@ defmodule Entities.Entity do
       end
 
       @impl GenServer
-      def handle_call({:get, context}, _from, %{} = state) do
-        {:reply, state, state}
+      def handle_call({:get, context}, _from, %Cache{} = state) do
+        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now() }
+        {:reply, state.entity, new_cache}
       end
 
       @impl GenServer
       def handle_call(
             {:send_action, context, action},
             _from,
-            %{} = state
+            %Cache{} = state
           ) do
-        state = Entities.Entity.send_action(__MODULE__, context, state.id, state, action)
-        {:reply, state, state}
+        entity = Entities.Entity.send_action(__MODULE__, context, state.entity.id, state.entity, action)
+        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now(), entity: entity }
+        {:reply, entity, new_cache}
       end
 
       @doc false
