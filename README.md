@@ -61,7 +61,8 @@ It receives the state of the Entity before the event, the event and the state of
 This callback gives you the opportunity to persist the change described by the event to the database in the same database transaction that persists the action and the events. 
 You can use that to create an internal read model that is always consistent. This allows you to leverage database constraints to ensure cross entity business rules are obeyed.  
 For example: If you want to make sure the shopping list names are unique, you can just have a **shopping_lists** table with a unique index in the **name** column and update that table in this callback.   
-A more traditional approach is to have a separate process reading from the event log and projecting the events to a read model. This is the only option you have if your event log is persisted to Kafka or something similar. Givan that we are persisting the events to Postgres there is no reason to not take advantage of the fact that we can have a read model that is always consistent and not only eventually consistent.  
+A more traditional approach is to have a separate process reading from the event log and projecting the events to a read model and creating compensanting transactions if something goes wrong.  
+This is the only option you have if your event log is persisted to Kafka or something similar. Givan that we are persisting the events to Postgres there is no reason to not take advantage of the fact that we can have a read model that is always consistent and not only eventually consistent.  
 ```elixir
   def project_event(
         %Context{} = _context,
