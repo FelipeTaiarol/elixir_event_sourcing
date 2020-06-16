@@ -15,7 +15,7 @@ defmodule Entities.Entity do
   @doc """
     Receives the current state of the Entity and an Action and it should return a list of Events
   """
-  @callback handle_action(context :: any, state :: any, action :: any) :: any
+  @callback handle_action(context :: any, state :: any, action :: any) :: list(any)
   @doc """
     Receives the current state of the Entity and an Event and it should return the changed Entity state.
   """
