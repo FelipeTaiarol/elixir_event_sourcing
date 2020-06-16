@@ -103,11 +103,13 @@ It receives the pid of the process for a given Entity instance, the request cont
 To find the process for a given Entity instance you should use the **entity_process** function from the **Entities.Supervisor** module.  
 
 ```elixir
-Entities.Supervisor.entity_process(
+pid = Entities.Supervisor.entity_process(
     Example.ShoppingListEntity,
     shopping_list_id,
     context
   )
 ```
+
+Check the [resolvers](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example_web/resolver.ex) for an example of usage of the Supervisor and the Entity API.  
 
 
