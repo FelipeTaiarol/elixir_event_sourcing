@@ -112,4 +112,13 @@ pid = Entities.Supervisor.entity_process(
 
 Check the [resolvers](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example_web/resolver.ex) for an example of usage of the Supervisor and the Entity API.  
 
+### Entity Guarantees
+  - Every Entity instance will be its own process. That guarantees that the calls to **send_action** will be serialized and executed one after the other.  
+  - When the Entity process is created, the Entity will be loaded to the memory. That is done by getting all the events for that Entity and running the **apply_event** callback.  
+  - The Entity will remain in memory until there is no read or write operation for more than 60 seconds. At this point the process will terminate itself and the memory will be released.  
+
+### Entities Database Schema 
+
+TODO
+
 
