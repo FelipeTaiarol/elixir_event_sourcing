@@ -23,6 +23,7 @@ lib
 
 ## The Entity macro
 
+### Creating a new Entity 
 The [ShoppingListEntity](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example/shopping_list/shopping_list.entity.ex) is an example of usage of the Entity macro.
 
 ```elixir
