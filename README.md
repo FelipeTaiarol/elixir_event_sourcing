@@ -82,7 +82,23 @@ It receives the Entity ID and arguments and it should return an action. This act
 
 ### Entity API and Guarantees
 
-To find a 
+This is the public API of every Entity:
+
+**def create(context, args)**. 
+It receives the request context and arguments and it creates an instance of that Entity.
+
+ps: **context** has always a hardcoded for now. It will have information such as the userId and the requestId in the future.  
+
+**def get(entity, context) when is_pid(entity)**.  
+It receives the pid of the process for a given Entity instance, the request context and it returns the Entity.  
+
+**def send_action(entity, context, action) when is_pid(entity)**
+
+It receives the pid of the process for a given Entity instance, the request context and an action and it returns the changed Entity.  
+
+```
+def create(context, args)
+```
 
 ```elixir
 defp shopping_list_process(shopping_list_id, context) do
