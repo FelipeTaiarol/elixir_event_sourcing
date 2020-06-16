@@ -25,7 +25,12 @@ lib
 
 The [ShoppingListEntity](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example/shopping_list/shopping_list.entity.ex) is an example of usage of the Entity macro.
 
-To use the macro you have to implement the following callbacks:
+```elixir
+defmodule Example.ShoppingListEntity do
+  use Entities.Entity
+```
+
+To use the Entity macro you have to implement the following callbacks:
 
 **get_entity_type() :: String.t()**.  
 It should return an arbritary string that will be added to the ```entity_type``` column in the ```entity_actions``` and ```entity_events``` tables.
