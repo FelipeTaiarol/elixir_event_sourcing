@@ -151,7 +151,7 @@ The **entity_events** has one row per event. The **entity_version** column is th
   create(unique_index(:entity_events, [:entity_id, :entity_version], prefix: "entities"))
 ```
 
-The **entity_actions** table is used for only for debugging. It is often useful to know what was the action that generated a given event.  
+The **entity_actions** table is used only for debugging. It is often useful to know what was the action that generated a given event.  
 ```elixir
     create table(:entity_actions, prefix: "entities") do
       add(:entity_id, references(:entities), null: false)
