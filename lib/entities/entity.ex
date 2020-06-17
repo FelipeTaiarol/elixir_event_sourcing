@@ -45,6 +45,7 @@ defmodule Entities.Entity do
       # If the process crashes for another reason, the Entity Supervisor will start a new one the next time the Entity is accessed.
       use GenServer, restart: :temporary
 
+      @doc false
       def start_link({entity_id, context}) do
         GenServer.start_link(__MODULE__, {entity_id, context}, name: via_tuple(entity_id))
       end
@@ -105,17 +106,17 @@ defmodule Entities.Entity do
       end
 
       @doc false
-      def handle_create(context, args) do
+      def handle_create(_context, _args) do
         raise "handle_create/2 not implemented"
       end
 
       @doc false
-      def handle_action(_state, _action) do
+      def handle_action(_context, _state, _action) do
         raise "handle_action/2 not implemented"
       end
 
       @doc false
-      def apply_event(_state, _event) do
+      def apply_event(_context, _state, _event) do
         raise "apply_event/2 not implemented"
       end
 
@@ -123,7 +124,7 @@ defmodule Entities.Entity do
       def project_event(%Context{} = _context, _before_event, _event, _after_event) do
       end
 
-      defoverridable handle_action: 2, apply_event: 2, handle_create: 2, project_event: 4
+      defoverridable handle_action: 3, apply_event: 3, handle_create: 2, project_event: 4
     end
   end
 

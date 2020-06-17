@@ -6,7 +6,11 @@ defmodule Example.ShoppingListEntity do
   alias Example.ShoppingList.CreateShoppingList
   alias Example.ShoppingList.SetName
 
-  defstruct [:id, :name, :version]
+  defstruct [
+    :id,
+    :name,
+    :version
+  ]
 
   @impl true
   def get_entity_type(), do: "shopping_list"
@@ -35,7 +39,7 @@ defmodule Example.ShoppingListEntity do
   def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),
     do: SetName.apply_event(context, state, event)
 
-    @impl true
+  @impl true
   def project_event(
         %Context{} = context,
         before_event,
