@@ -1,5 +1,5 @@
 # Event Sourcing in Elixir
-Mostly just a pet project that I am creating to learn Elixir.
+Mostly just a pet project that I am creating to learn Elixir. Still a work in progress.
 
 
 ## Setup Instructions
