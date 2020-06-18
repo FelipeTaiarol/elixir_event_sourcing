@@ -5,7 +5,7 @@ defmodule Entities.EntityHelpers do
   alias Entities.Context
 
   def persist_action(module, %Context{} = context, entity_id, action)
-       when is_integer(entity_id) do
+      when is_integer(entity_id) do
     %ActionRow{}
     |> ActionRow.changeset(%{
       type: action.__struct__,
@@ -18,7 +18,7 @@ defmodule Entities.EntityHelpers do
   end
 
   def persist_event(module, %ActionRow{} = action, event, entity_version)
-       when is_integer(entity_version) do
+      when is_integer(entity_version) do
     %EventRow{}
     |> EventRow.changeset(%{
       action_id: action.id,
@@ -53,13 +53,23 @@ defmodule Entities.EntityHelpers do
   end
 
   def update_entity_version(id, expected_version, new_version)
-       when is_integer(id) and is_integer(expected_version) and is_integer(new_version) do
-    query =
+      when is_integer(id) and is_integer(expected_version) and is_integer(new_version) do
+    from(
       from e in EntityRow,
         where: e.id == ^id,
-        update: [set: [version: ^new_version]]
-
-    # TODO: check expected version.
-    Repo.update_all(query, [])
+        update: [
+          set: [
+            version:
+              # Making sure the version that is in the database is the one that we expect.
+              # The "version" column has a constraint to only accept positive numbers.
+              fragment(
+                "(CASE WHEN version = ? THEN ? ELSE -1 END)",
+                ^expected_version,
+                ^new_version
+              )
+          ]
+        ]
+    )
+    |> Repo.update_all([])
   end
 end

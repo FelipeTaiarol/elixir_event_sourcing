@@ -8,6 +8,8 @@ defmodule Example.Repo.Migrations.Entities do
       timestamps()
     end
 
+    create(constraint("entities", :version_must_be_positive, check: "version >= 0", prefix: "entities"))
+
     create table(:entity_actions, prefix: "entities") do
       add(:entity_id, references(:entities), null: false)
       add(:entity_type, :string, null: false)
