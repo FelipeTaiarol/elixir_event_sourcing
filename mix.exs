@@ -48,7 +48,8 @@ defmodule Example.MixProject do
       {:pbkdf2_elixir, "~> 1.0"},
       {:cors_plug, "~> 2.0"},
       {:dataloader, "~> 1.0.6"},
-      {:poison, "~> 4.0"}
+      {:poison, "~> 4.0"},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 

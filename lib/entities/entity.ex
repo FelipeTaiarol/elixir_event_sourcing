@@ -28,7 +28,7 @@ defmodule Entities.Entity do
     It should return the action that creates this Entity.
     The Action will also be sent to handle_action/3
   """
-  @callback handle_create(context :: any, id :: Integer.t(), args :: any) :: any
+  @callback handle_create(context :: any, id :: integer, args :: any) :: any
   @doc """
     Receives the state of the Entity before the event, the Event and the state of the Entity after the Event.
     It can project that event to a data store.
