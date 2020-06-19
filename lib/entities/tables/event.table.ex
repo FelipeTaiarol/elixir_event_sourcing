@@ -12,6 +12,7 @@ defmodule Entities.Entity.EventRow do
     field :created_by, :integer
     field :action_id, :integer
 
+
     timestamps()
   end
 
@@ -30,5 +31,6 @@ defmodule Entities.Entity.EventRow do
 
     optional_fields = []
     event |> cast(attrs, required_fields ++ optional_fields)
+          |> unique_constraint([:entity_id, :entity_version])
   end
 end
