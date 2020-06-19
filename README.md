@@ -170,6 +170,7 @@ The **entity_actions** table is used only for debugging. It is often useful to k
   2. Create an abstraction to have separate read models that are eventually consistent.  
   3. Create an implementation of the Saga pattern for long running operations.  
   4. Create a way to persist actions to multiple entities in the same database transaction (I have done that in a previous project and it is very useful if used with caution). 
+  5. Provide a way for clients to subscribe to an Entity and be notified via websockets when it changes.  
   
   
   
