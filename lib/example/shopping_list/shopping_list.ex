@@ -3,6 +3,21 @@ defmodule Example.ShoppingList do
   alias Entities.Context
   alias Example.ShoppingList.Actions.{SetName}
 
+  defstruct [
+    :id,
+    :name,
+    :version,
+    :items
+  ]
+
+  @type t :: %__MODULE__{
+    id: integer,
+    name: String.t(),
+    version: integer,
+    items: ShoppingList.ShoppingListItem.t
+  }
+
+
   def create(%Context{} = context, %{name: name}) do
     Entity.create(context, %{name: name})
   end

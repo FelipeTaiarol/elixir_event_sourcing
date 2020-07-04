@@ -21,7 +21,7 @@ defmodule Example.ShoppingList.CreateShoppingList do
   end
 
   def apply_event(%Context{} = _context, nil, %ShoppingListCreated{} = event) do
-    %ShoppingList.Entity{
+    %ShoppingList{
       id: event.id,
       name: event.name,
       version: 0,
@@ -33,7 +33,7 @@ defmodule Example.ShoppingList.CreateShoppingList do
         %Context{} = _context,
         _before_event,
         %ShoppingListCreated{} = _event,
-        %ShoppingList.Entity{} = after_event
+        %ShoppingList{} = after_event
       ) do
     %ShoppingList.ShoppingListTable{}
     |> ShoppingList.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})

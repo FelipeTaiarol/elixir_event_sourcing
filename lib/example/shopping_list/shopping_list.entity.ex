@@ -8,20 +8,6 @@ defmodule Example.ShoppingList.Entity do
   alias Example.ShoppingList.Items.AddItem
   alias Example.ShoppingList
 
-  defstruct [
-    :id,
-    :name,
-    :version,
-    :items
-  ]
-
-  @type t :: %__MODULE__{
-    id: integer,
-    name: String.t(),
-    version: integer,
-    items: ShoppingList.ShoppingListItem.t
-  }
-
   @impl true
   def get_entity_type(), do: "shopping_list"
 
@@ -34,7 +20,7 @@ defmodule Example.ShoppingList.Entity do
   end
 
   @impl true
-  def handle_action(%Context{} = context, %__MODULE__{} = state, %Actions.SetName{} = event),
+  def handle_action(%Context{} = context, %ShoppingList{} = state, %Actions.SetName{} = event),
     do: SetName.handle_action(context, state, event)
 
   @impl true
@@ -50,11 +36,11 @@ defmodule Example.ShoppingList.Entity do
     do: CreateShoppingList.apply_event(context, nil, event)
 
   @impl true
-  def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),
+  def apply_event(%Context{} = context, %ShoppingList{} = state, %Events.NameChanged{} = event),
     do: SetName.apply_event(context, state, event)
 
   @impl true
-  def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.ItemAdded{} = event),
+  def apply_event(%Context{} = context, %ShoppingList{} = state, %Events.ItemAdded{} = event),
     do: AddItem.apply_event(context, state, event)
 
   @impl true
@@ -62,25 +48,25 @@ defmodule Example.ShoppingList.Entity do
         %Context{} = context,
         before_event,
         %Events.ShoppingListCreated{} = event,
-        %__MODULE__{} = after_event
+        %ShoppingList{} = after_event
       ),
       do: CreateShoppingList.project_event(context, before_event, event, after_event)
 
   @impl true
   def project_event(
         %Context{} = context,
-        %__MODULE__{} = before_event,
+        %ShoppingList{} = before_event,
         %Events.NameChanged{} = event,
-        %__MODULE__{} = after_event
+        %ShoppingList{} = after_event
       ),
       do: SetName.project_event(context, before_event, event, after_event)
 
   @impl true
   def project_event(
         %Context{} = context,
-        %__MODULE__{} = before_event,
+        %ShoppingList{} = before_event,
         %Events.ItemAdded{} = event,
-        %__MODULE__{} = after_event
+        %ShoppingList{} = after_event
       ),
       do: AddItem.project_event(context, before_event, event, after_event)
 end
