@@ -23,6 +23,13 @@ defmodule Example.Schema do
       arg(:name, non_null(:string))
       resolve(&Resolver.change_shopping_list_name/3)
     end
+
+    @desc "Add item"
+    field :add_item, :shopping_list do
+      arg(:shopping_list_id, non_null(:integer))
+      arg(:name, non_null(:string))
+      resolve(&Resolver.add_item/3)
+    end
   end
 
   object :entity do
@@ -41,5 +48,12 @@ defmodule Example.Schema do
     field :id, non_null(:integer)
     field :name, non_null(:string)
     field :version, non_null(:integer)
+    field :items, list_of(:shopping_list_item)
+  end
+
+  object :shopping_list_item do
+    field :id, non_null(:string)
+    field :name, non_null(:string)
+    field :quantity, non_null(:integer)
   end
 end

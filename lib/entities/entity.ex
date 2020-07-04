@@ -14,22 +14,31 @@ defmodule Entities.Entity do
   end
 
   @doc """
+    Returns the Entity type.
+  """
+  @callback get_entity_type() :: String.t()
+
+  @doc """
+    Returns the module that defines the struct for this Entity.
+  """
+  @callback get_entity_struct() :: struct()
+
+  @doc """
     Receives the current state of the Entity and an Action and it should return a list of Events
   """
   @callback handle_action(context :: any, state :: any, action :: any) :: list(any)
+
   @doc """
     Receives the current state of the Entity and an Event and it should return the changed Entity state.
   """
   @callback apply_event(context :: any, state :: any, event :: any) :: any
-  @doc """
-    Returns the Entity type.
-  """
-  @callback get_entity_type() :: String.t()
+
   @doc """
     It should return the action that creates this Entity.
     The Action will also be sent to handle_action/3
   """
   @callback handle_create(context :: any, id :: integer, args :: any) :: any
+
   @doc """
     Receives the state of the Entity before the event, the Event and the state of the Entity after the Event.
     It can project that event to a data store.
@@ -41,9 +50,9 @@ defmodule Entities.Entity do
     quote do
       @behaviour Entities.Entity
       # in milliseconds
-      @cache_check_interval 5000
+      @cache_check_interval 1000
       # in seconds
-      @cache_invalidation_time 60
+      @cache_invalidation_time 10
 
       # The process will stop itself if the Entity was not accessed in more than @cache_invalidation_time.
       # If the process crashes for another reason, the Entity Supervisor will start a new one the next time the Entity is accessed.
@@ -230,7 +239,11 @@ defmodule Entities.Entity do
 
   def get(module, _context, id) do
     entity_row = Repo.get!(EntityRow, id)
-    state = entity_row.snapshot && EntityHelpers.parse_to_struct(module, entity_row.snapshot)
+
+    state =
+      entity_row.snapshot &&
+        EntityHelpers.parse_to_struct(module.get_entity_struct(), entity_row.snapshot)
+
     get_state(module, state, entity_row)
   end
 

@@ -44,7 +44,7 @@ defmodule Entities.EntityHelpers do
       map
       |> Poison.encode()
       |> (fn {:ok, json} -> json end).()
-      |> Poison.decode(as: struct!(module))
+      |> Poison.decode(as: struct!(module), keys: :atoms!)
 
     parsed
   end

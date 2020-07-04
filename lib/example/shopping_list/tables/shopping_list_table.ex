@@ -1,4 +1,4 @@
-defmodule Example.ShoppingList.ShoppingListTable do
+defmodule Example.ShoppingList.Tables.ShoppingListTable do
   use Ecto.Schema
   import Ecto.Changeset
   @schema_prefix "read"

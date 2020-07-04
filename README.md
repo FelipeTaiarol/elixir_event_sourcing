@@ -71,8 +71,8 @@ This is the only option you have if your event log is persisted to Kafka or some
         %NameChanged{} = _event,
         %ShoppingList.Entity{} = after_event
       ) do
-        %ShoppingListTable{id: after_event.id}
-          |> ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
+        %Tables.ShoppingListTable{id: after_event.id}
+          |> Tables.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
           |> Repo.update!()
   end
 ```

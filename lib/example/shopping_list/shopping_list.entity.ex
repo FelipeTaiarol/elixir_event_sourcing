@@ -12,6 +12,9 @@ defmodule Example.ShoppingList.Entity do
   def get_entity_type(), do: "shopping_list"
 
   @impl true
+  def get_entity_struct(), do: ShoppingList.__struct__()
+
+  @impl true
   def handle_create(%Context{} = _context, id, %{name: name}) do
     %Actions.CreateShoppingList{
       id: id,

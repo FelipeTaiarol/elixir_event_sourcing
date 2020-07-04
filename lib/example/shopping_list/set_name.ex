@@ -3,6 +3,7 @@ defmodule Example.ShoppingList.SetName do
   alias Example.ShoppingList.Actions.SetName
   alias Example.ShoppingList.Events.NameChanged
   alias Example.ShoppingList
+  alias Example.ShoppingList.Tables
   alias Example.Repo
 
   def handle_action(%Context{} = _context, %ShoppingList{} = _state, %SetName{name: name}) do
@@ -19,8 +20,8 @@ defmodule Example.ShoppingList.SetName do
         %NameChanged{} = _event,
         %ShoppingList{} = after_event
       ) do
-    %ShoppingList.ShoppingListTable{id: after_event.id}
-    |> ShoppingList.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
+    %Tables.ShoppingListTable{id: after_event.id}
+    |> Tables.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
     |> Repo.update!()
   end
 end

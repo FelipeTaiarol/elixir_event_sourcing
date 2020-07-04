@@ -16,7 +16,13 @@ defmodule Example.Schema.Resolver do
 
   def change_shopping_list_name(_, %{shopping_list_id: shopping_list_id, name: name}, _) do
     context = %Context{user_id: 1}
-    changed = ShoppingList.set_name(context,  %{shopping_list_id: shopping_list_id, name: name})
+    changed = ShoppingList.set_name(context, shopping_list_id, name)
+    {:ok, changed}
+  end
+
+  def add_item(_, args, _) do
+    context = %Context{user_id: 1}
+    changed = ShoppingList.add_item(context, args.shopping_list_id, args)
     {:ok, changed}
   end
 end

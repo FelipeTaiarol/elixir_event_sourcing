@@ -5,7 +5,8 @@ defmodule CreateShoppingListTest do
   mutation ($name: String!) {
     createShoppingList(name: $name) {
       id,
-      name
+      name,
+      version
     }
   }
   """
@@ -14,7 +15,8 @@ defmodule CreateShoppingListTest do
   mutation ($shoppingListId: Int!, $name: String!){
     changeShoppingListName(shoppingListId: $shoppingListId, name: $name){
       id,
-      name
+      name,
+      version
     }
   }
   """
@@ -25,6 +27,18 @@ defmodule CreateShoppingListTest do
       id,
       name,
       version
+    }
+  }
+  """
+
+  @addItem """
+  mutation ($shoppingListId: Int!, $itemName: String!){
+    addItem(shoppingListId: $shoppingListId, name: $itemName){
+      id,
+      version,
+      items {
+        name
+      }
     }
   }
   """
@@ -46,7 +60,7 @@ defmodule CreateShoppingListTest do
       })
 
     assert json_response(conn, 200) == %{
-             "data" => %{"createShoppingList" => %{"name" => name, "id" => id}}
+             "data" => %{"createShoppingList" => %{"name" => name, "id" => id, "version" => 1}}
            }
 
     conn =
@@ -56,7 +70,9 @@ defmodule CreateShoppingListTest do
       })
 
     assert json_response(conn, 200) == %{
-             "data" => %{"changeShoppingListName" => %{"name" => new_name, "id" => id}}
+             "data" => %{
+               "changeShoppingListName" => %{"name" => new_name, "id" => id, "version" => 2}
+             }
            }
 
     conn =
@@ -67,6 +83,18 @@ defmodule CreateShoppingListTest do
 
     assert json_response(conn, 200) == %{
              "data" => %{"shoppingList" => %{"name" => new_name, "id" => id, "version" => 2}}
+           }
+
+    conn =
+      post(conn, "/api", %{
+        "query" => @addItem,
+        "variables" => %{shoppingListId: id, itemName: "item 1"}
+      })
+
+    assert json_response(conn, 200) == %{
+             "data" => %{
+               "addItem" => %{"id" => id, "version" => 3, "items" => [%{"name" => "item 1"}]}
+             }
            }
   end
 end

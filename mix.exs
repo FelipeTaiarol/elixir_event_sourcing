@@ -49,7 +49,8 @@ defmodule Example.MixProject do
       {:cors_plug, "~> 2.0"},
       {:dataloader, "~> 1.0.6"},
       {:poison, "~> 4.0"},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:elixir_uuid, "~> 1.2"}
     ]
   end
 

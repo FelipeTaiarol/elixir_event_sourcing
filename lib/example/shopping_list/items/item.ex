@@ -6,8 +6,8 @@ defmodule Example.ShoppingList.Items.Item do
   ]
 
   @type t :: %__MODULE__{
-    id: integer,
-    name: String.t(),
-    quantity: integer
-  }
+          id: integer,
+          name: String.t(),
+          quantity: integer
+        }
 end

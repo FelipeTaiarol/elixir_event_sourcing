@@ -3,6 +3,7 @@ defmodule Example.ShoppingList.CreateShoppingList do
   alias Example.ShoppingList.Actions.CreateShoppingList
   alias Example.ShoppingList.Events.ShoppingListCreated
   alias Example.ShoppingList
+  alias Example.ShoppingList.Tables
   alias Example.Repo
 
   def handle_action(%Context{} = _context, state, %CreateShoppingList{id: id, name: name}) do
@@ -35,8 +36,8 @@ defmodule Example.ShoppingList.CreateShoppingList do
         %ShoppingListCreated{} = _event,
         %ShoppingList{} = after_event
       ) do
-    %ShoppingList.ShoppingListTable{}
-    |> ShoppingList.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
+    %Tables.ShoppingListTable{}
+    |> Tables.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
     |> Repo.insert!()
   end
 end
