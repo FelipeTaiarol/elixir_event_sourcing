@@ -5,6 +5,8 @@ defmodule Example.Repo.Migrations.Entities do
     create table(:entities, prefix: "entities") do
       add(:version, :bigint, null: false)
       add(:type, :string, null: false)
+      add(:snapshot, :map)
+      add(:snapshot_version, :bigint)
       timestamps()
     end
 

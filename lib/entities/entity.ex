@@ -8,7 +8,8 @@ defmodule Entities.Entity do
   defmodule Cache do
     defstruct [
       :last_accessed_at,
-      :entity
+      :entity,
+      :changed
     ]
   end
 
@@ -55,7 +56,8 @@ defmodule Entities.Entity do
         Process.send_after(self(), :maybe_stop_process, @cache_check_interval)
         state = %Cache{
           entity: Entities.Entity.get(__MODULE__, context, entity_id),
-          last_accessed_at: DateTime.utc_now()
+          last_accessed_at: DateTime.utc_now(),
+          changed: false
         }
         {:ok, state}
       end
@@ -89,7 +91,7 @@ defmodule Entities.Entity do
             %Cache{} = state
           ) do
         entity = Entities.Entity.send_action(__MODULE__, context, state.entity.id, state.entity, action)
-        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now(), entity: entity }
+        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now(), entity: entity, changed: true }
         {:reply, entity, new_cache}
       end
 
@@ -100,8 +102,20 @@ defmodule Entities.Entity do
         limit = DateTime.add(state.last_accessed_at, @cache_invalidation_time, :second)
         diff = DateTime.diff(limit, DateTime.utc_now())
         cond do
-          diff < 0 -> {:stop, :normal, state}
+          diff < 0 ->
+            maybe_take_snapshot(state)
+            {:stop, :normal, state}
           true -> {:noreply, state}
+        end
+      end
+
+      defp maybe_take_snapshot(%Cache{entity: entity, changed: changed} = state) do
+        cond do
+          changed ->
+            Repo.get!(EntityRow, entity.id)
+              |> EntityRow.changeset(%{snapshot: entity, snapshot_version: entity.version})
+              |> Repo.update!()
+          true -> {:ok}
         end
       end
 
@@ -187,23 +201,25 @@ defmodule Entities.Entity do
   end
 
   def get(module, _context, id) do
-    Repo.get!(EntityRow, id)
-    get_state(module, nil, id)
+    entity_row = Repo.get!(EntityRow, id)
+    state = entity_row.snapshot && EntityHelpers.parse_to_struct(module, entity_row.snapshot)
+    get_state(module, state, entity_row)
   end
 
-  def get_state(module, state, id) do
-    version = EntityHelpers.get_version(state)
+  def get_state(module, state, %EntityRow{} = entity_row) do
+    version = entity_row.snapshot_version || EntityHelpers.get_version(state)
 
     query =
       from e in EventRow,
         where:
-          e.entity_id == ^id and
+          e.entity_id == ^entity_row.id and
             e.entity_version > ^version,
         order_by: e.entity_version,
         select: e
 
     events = Repo.all(query)
-    play_events(module, events, nil)
+    final_state = play_events(module, events, state)
+    final_state
   end
 
   defp play_events(module, events, state) do

@@ -34,15 +34,17 @@ defmodule Entities.EntityHelpers do
 
   def row_to_event_and_context(%EventRow{} = row) do
     module = String.to_existing_atom(row.type)
+    event = parse_to_struct(module, row.payload)
+    {event, %Context{user_id: row.created_by}}
+  end
 
-    # Workaround so that we have an struct (the keys are atoms) and not a map (the keys are strings)
-    {:ok, event} =
-      row.payload
+  # Workaround to transform map into struct.
+  def parse_to_struct(module, map) do
+    {:ok, parsed} = map
       |> Poison.encode()
       |> (fn {:ok, json} -> json end).()
       |> Poison.decode(as: struct!(module))
-
-    {event, %Context{user_id: row.created_by}}
+      parsed
   end
 
   def get_version(entity) do
