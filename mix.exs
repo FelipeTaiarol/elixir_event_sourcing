@@ -61,7 +61,7 @@ defmodule Example.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["run priv/repo/drop_all.exs", "ecto.create", "ecto.migrate"],
+      "ecto.setup": ["ecto.create", "run priv/repo/drop_all.exs", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.setup", "test"]
     ]
