@@ -2,8 +2,7 @@ defmodule Example.ShoppingList.CreateShoppingList do
   alias Entities.Context
   alias Example.ShoppingList.Actions.CreateShoppingList
   alias Example.ShoppingList.Events.ShoppingListCreated
-  alias Example.ShoppingListEntity
-  alias Example.ShoppingList.Tables
+  alias Example.ShoppingList
   alias Example.Repo
 
   def handle_action(%Context{} = _context, state, %CreateShoppingList{id: id, name: name}) do
@@ -22,10 +21,11 @@ defmodule Example.ShoppingList.CreateShoppingList do
   end
 
   def apply_event(%Context{} = _context, nil, %ShoppingListCreated{} = event) do
-    %ShoppingListEntity{
+    %ShoppingList.Entity{
       id: event.id,
       name: event.name,
-      version: 0
+      version: 0,
+      items: []
     }
   end
 
@@ -33,10 +33,10 @@ defmodule Example.ShoppingList.CreateShoppingList do
         %Context{} = _context,
         _before_event,
         %ShoppingListCreated{} = _event,
-        %ShoppingListEntity{} = after_event
+        %ShoppingList.Entity{} = after_event
       ) do
-    %Tables.ShoppingList{}
-    |> Tables.ShoppingList.changeset(%{id: after_event.id, name: after_event.name})
+    %ShoppingList.ShoppingListTable{}
+    |> ShoppingList.ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
     |> Repo.insert!()
   end
 end

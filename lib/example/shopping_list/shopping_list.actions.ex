@@ -12,4 +12,12 @@ defmodule Example.ShoppingList.Actions do
       :name
     ]
   end
+
+  defmodule AddItem do
+    defstruct [
+      :id,
+      :name,
+      :quantity
+    ]
+  end
 end

@@ -1,16 +1,26 @@
-defmodule Example.ShoppingListEntity do
+defmodule Example.ShoppingList.Entity do
   use Entities.Entity
   alias Entities.Context
   alias Example.ShoppingList.Actions
   alias Example.ShoppingList.Events
   alias Example.ShoppingList.CreateShoppingList
   alias Example.ShoppingList.SetName
+  alias Example.ShoppingList.Items.AddItem
+  alias Example.ShoppingList
 
   defstruct [
     :id,
     :name,
-    :version
+    :version,
+    :items
   ]
+
+  @type t :: %__MODULE__{
+    id: integer,
+    name: String.t(),
+    version: integer,
+    items: ShoppingList.ShoppingListItem.t
+  }
 
   @impl true
   def get_entity_type(), do: "shopping_list"
@@ -32,12 +42,20 @@ defmodule Example.ShoppingListEntity do
     do: CreateShoppingList.handle_action(context, state, action)
 
   @impl true
+  def handle_action(%Context{} = context, state, %Actions.AddItem{} = action),
+    do: AddItem.handle_action(context, state, action)
+
+  @impl true
   def apply_event(%Context{} = context, nil, %Events.ShoppingListCreated{} = event),
     do: CreateShoppingList.apply_event(context, nil, event)
 
   @impl true
   def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.NameChanged{} = event),
     do: SetName.apply_event(context, state, event)
+
+  @impl true
+  def apply_event(%Context{} = context, %__MODULE__{} = state, %Events.ItemAdded{} = event),
+    do: AddItem.apply_event(context, state, event)
 
   @impl true
   def project_event(
@@ -56,4 +74,13 @@ defmodule Example.ShoppingListEntity do
         %__MODULE__{} = after_event
       ),
       do: SetName.project_event(context, before_event, event, after_event)
+
+  @impl true
+  def project_event(
+        %Context{} = context,
+        %__MODULE__{} = before_event,
+        %Events.ItemAdded{} = event,
+        %__MODULE__{} = after_event
+      ),
+      do: AddItem.project_event(context, before_event, event, after_event)
 end

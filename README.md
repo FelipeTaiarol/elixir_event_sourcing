@@ -24,10 +24,10 @@ An Entity is a struct that must have at least these fields **id**, **type**, **v
 ## The Entity macro
 
 ### Creating a new Entity 
-The [ShoppingListEntity](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example/shopping_list/shopping_list.entity.ex) is an example of usage of the Entity macro.
+The [ShoppingList.Entity](https://github.com/FelipeTaiarol/elixir_event_sourcing/blob/master/lib/example/shopping_list/shopping_list.entity.ex) is an example of usage of the Entity macro.
 
 ```elixir
-defmodule Example.ShoppingListEntity do
+defmodule Example.ShoppingList.Entity do
   use Entities.Entity
 ```
 
@@ -43,7 +43,7 @@ def get_entity_type(), do: "shopping_list"
 It receives the current state of the entity and an action and it should return a list of events.
 This is where all the validation logic should be. This callback will be executed only once for each action that is received. 
 ```elixir
-def handle_action(%Context{} = _context, %ShoppingListEntity{} = _state, %SetName{name: name}) do
+def handle_action(%Context{} = _context, %ShoppingList.Entity{} = _state, %SetName{name: name}) do
   [%NameChanged{name: name}]
 end
 ```
@@ -52,8 +52,8 @@ end
 It receives the current state of the Entity and an Event and it should return the changed Entity state.
 This should have only straight forward transformation from the old to the new state. This callback will be executed every time the Entity is loaded into memory. 
 ```elixir
-def apply_event(%Context{} = _context, %ShoppingListEntity{} = state, %NameChanged{name: name}) do
-  %ShoppingListEntity{state | name: name}
+def apply_event(%Context{} = _context, %ShoppingList.Entity{} = state, %NameChanged{name: name}) do
+  %ShoppingList.Entity{state | name: name}
 end
 ```
 
@@ -67,12 +67,12 @@ This is the only option you have if your event log is persisted to Kafka or some
 ```elixir
   def project_event(
         %Context{} = _context,
-        %ShoppingListEntity{} = _before_event,
+        %ShoppingList.Entity{} = _before_event,
         %NameChanged{} = _event,
-        %ShoppingListEntity{} = after_event
+        %ShoppingList.Entity{} = after_event
       ) do
-        %Tables.ShoppingList{id: after_event.id}
-          |> Tables.ShoppingList.changeset(%{id: after_event.id, name: after_event.name})
+        %ShoppingListTable{id: after_event.id}
+          |> ShoppingListTable.changeset(%{id: after_event.id, name: after_event.name})
           |> Repo.update!()
   end
 ```
@@ -105,7 +105,7 @@ To find the process for a given Entity instance you should use the **entity_proc
 
 ```elixir
 pid = Entities.Supervisor.entity_process(
-    Example.ShoppingListEntity,
+    Example.ShoppingList.Entity,
     shopping_list_id,
     context
   )

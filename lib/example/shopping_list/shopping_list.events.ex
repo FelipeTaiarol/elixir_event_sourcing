@@ -11,4 +11,12 @@ defmodule Example.ShoppingList.Events do
       :name
     ]
   end
+
+  defmodule ItemAdded do
+    defstruct [
+      :id,
+      :name,
+      :quantity
+    ]
+  end
 end

@@ -3,9 +3,13 @@ defmodule Entities.Entity.ActionRow do
   import Ecto.Changeset
   @schema_prefix "entities"
 
-  @type t :: %__MODULE__{
-          entity_type: String.t()
-        }
+  @type t(payload) :: %__MODULE__{
+    entity_type: String.t(),
+    entity_type: integer,
+    type: String.t(),
+    payload: payload,
+    created_by: integer
+  }
 
   schema "entity_actions" do
     field :entity_id, :integer
