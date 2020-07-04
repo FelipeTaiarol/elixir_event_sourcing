@@ -1,6 +1,6 @@
 defmodule Entities.Supervisor do
   def start_link() do
-    IO.puts "Starting supervisor"
+    IO.puts("Starting supervisor")
     DynamicSupervisor.start_link(name: __MODULE__, strategy: :one_for_one)
   end
 
@@ -17,6 +17,7 @@ defmodule Entities.Supervisor do
       {:ok, pid} ->
         IO.puts("Entity process started #{inspect(entity_module)} #{entity_id}")
         pid
+
       {:error, {:already_started, pid}} ->
         pid
     end

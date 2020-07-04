@@ -38,6 +38,7 @@ defmodule CreateShoppingListTest do
   defp create_update_read(conn, id) do
     name = "list #{id}"
     new_name = "new name #{id}"
+
     conn =
       post(conn, "/api", %{
         "query" => @createShoppingList,

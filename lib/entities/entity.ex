@@ -34,13 +34,16 @@ defmodule Entities.Entity do
     Receives the state of the Entity before the event, the Event and the state of the Entity after the Event.
     It can project that event to a data store.
   """
-  @callback project_event(context :: any, before_event :: any, event :: any, before_event :: any) :: any
+  @callback project_event(context :: any, before_event :: any, event :: any, before_event :: any) ::
+              any
 
   defmacro __using__([]) do
     quote do
       @behaviour Entities.Entity
-      @cache_check_interval 5000 # in milliseconds
-      @cache_invalidation_time 60 # in seconds
+      # in milliseconds
+      @cache_check_interval 5000
+      # in seconds
+      @cache_invalidation_time 60
 
       # The process will stop itself if the Entity was not accessed in more than @cache_invalidation_time.
       # If the process crashes for another reason, the Entity Supervisor will start a new one the next time the Entity is accessed.
@@ -54,11 +57,13 @@ defmodule Entities.Entity do
       @impl GenServer
       def init({entity_id, context}) do
         Process.send_after(self(), :maybe_stop_process, @cache_check_interval)
+
         state = %Cache{
           entity: Entities.Entity.get(__MODULE__, context, entity_id),
           last_accessed_at: DateTime.utc_now(),
           changed: false
         }
+
         {:ok, state}
       end
 
@@ -80,7 +85,7 @@ defmodule Entities.Entity do
 
       @impl GenServer
       def handle_call({:get, context}, _from, %Cache{} = state) do
-        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now() }
+        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now()}
         {:reply, state.entity, new_cache}
       end
 
@@ -90,8 +95,16 @@ defmodule Entities.Entity do
             _from,
             %Cache{} = state
           ) do
-        entity = Entities.Entity.send_action(__MODULE__, context, state.entity.id, state.entity, action)
-        new_cache = %Cache{state | last_accessed_at: DateTime.utc_now(), entity: entity, changed: true }
+        entity =
+          Entities.Entity.send_action(__MODULE__, context, state.entity.id, state.entity, action)
+
+        new_cache = %Cache{
+          state
+          | last_accessed_at: DateTime.utc_now(),
+            entity: entity,
+            changed: true
+        }
+
         {:reply, entity, new_cache}
       end
 
@@ -101,11 +114,14 @@ defmodule Entities.Entity do
 
         limit = DateTime.add(state.last_accessed_at, @cache_invalidation_time, :second)
         diff = DateTime.diff(limit, DateTime.utc_now())
+
         cond do
           diff < 0 ->
             maybe_take_snapshot(state)
             {:stop, :normal, state}
-          true -> {:noreply, state}
+
+          true ->
+            {:noreply, state}
         end
       end
 
@@ -113,9 +129,11 @@ defmodule Entities.Entity do
         cond do
           changed ->
             Repo.get!(EntityRow, entity.id)
-              |> EntityRow.changeset(%{snapshot: entity, snapshot_version: entity.version})
-              |> Repo.update!()
-          true -> {:ok}
+            |> EntityRow.changeset(%{snapshot: entity, snapshot_version: entity.version})
+            |> Repo.update!()
+
+          true ->
+            {:ok}
         end
       end
 
@@ -147,6 +165,7 @@ defmodule Entities.Entity do
       Repo.transaction(fn ->
         _create(module, context, args)
       end)
+
     result
   end
 
@@ -168,6 +187,7 @@ defmodule Entities.Entity do
       Repo.transaction(fn ->
         _send_action(module, context, id, state, action)
       end)
+
     result
   end
 
@@ -178,19 +198,27 @@ defmodule Entities.Entity do
 
     events = module.handle_action(context, state, action)
 
-    final_state = events
-      |> Enum.with_index
-      |> Enum.reduce(state, fn({event, index}, state) ->
+    final_state =
+      events
+      |> Enum.with_index()
+      |> Enum.reduce(state, fn {event, index}, state ->
         next_version = current_version + index + 1
         process_event(module, context, state, action_row, event, next_version)
       end)
 
-      EntityHelpers.update_entity_version(id, current_version, current_version + Enum.count(events))
+    EntityHelpers.update_entity_version(id, current_version, current_version + Enum.count(events))
 
     final_state
   end
 
-  defp process_event(module, %Context{} = context, state, %ActionRow{} = action_row, event, next_version) do
+  defp process_event(
+         module,
+         %Context{} = context,
+         state,
+         %ActionRow{} = action_row,
+         event,
+         next_version
+       ) do
     EntityHelpers.persist_event(module, action_row, event, next_version)
 
     final_state = _apply_event(module, context, state, event)

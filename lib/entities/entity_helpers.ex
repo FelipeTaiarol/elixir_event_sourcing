@@ -40,11 +40,13 @@ defmodule Entities.EntityHelpers do
 
   # Workaround to transform map into struct.
   def parse_to_struct(module, map) do
-    {:ok, parsed} = map
+    {:ok, parsed} =
+      map
       |> Poison.encode()
       |> (fn {:ok, json} -> json end).()
       |> Poison.decode(as: struct!(module))
-      parsed
+
+    parsed
   end
 
   def get_version(entity) do
@@ -61,9 +63,9 @@ defmodule Entities.EntityHelpers do
         where: e.id == ^id,
         update: [
           set: [
+            # Making sure the version that is in the database is the one that we expect.
+            # The "version" column has a constraint to only accept positive numbers.
             version:
-              # Making sure the version that is in the database is the one that we expect.
-              # The "version" column has a constraint to only accept positive numbers.
               fragment(
                 "(CASE WHEN version = ? THEN ? ELSE -1 END)",
                 ^expected_version,

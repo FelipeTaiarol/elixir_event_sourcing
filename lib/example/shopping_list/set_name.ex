@@ -20,8 +20,8 @@ defmodule Example.ShoppingList.SetName do
         %NameChanged{} = _event,
         %ShoppingListEntity{} = after_event
       ) do
-        %Tables.ShoppingList{id: after_event.id}
-          |> Tables.ShoppingList.changeset(%{id: after_event.id, name: after_event.name})
-          |> Repo.update!()
+    %Tables.ShoppingList{id: after_event.id}
+    |> Tables.ShoppingList.changeset(%{id: after_event.id, name: after_event.name})
+    |> Repo.update!()
   end
 end
