@@ -39,6 +39,13 @@ It should return an arbritary string that will be added to the ```entity_type```
 def get_entity_type(), do: "shopping_list"
 ```
 
+**get_entity_struct() :: struct()**  
+Returns the module that defines the struct for this Entity.  
+It is done this way so that you can have [one module](/lib/example/shopping_list/shopping_list.ex) that defines the struct and the public API and [another module](/lib/example/shopping_list/shopping_list.entity.ex) that uses the Entity macro and dispatches the actions and events.  
+```elixir
+def get_entity_struct(), do: ShoppingList.__struct__()
+```
+
 **handle_action(context :: any, state :: any, action :: any) :: list(any)**.   
 It receives the current state of the entity and an action and it should return a list of events.
 This is where all the validation logic should be. This callback will be executed only once for each action that is received. 
