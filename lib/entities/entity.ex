@@ -240,26 +240,26 @@ defmodule Entities.Entity do
   def get(module, _context, id) do
     entity_row = Repo.get!(EntityRow, id)
 
-    state =
+    snapshot =
       entity_row.snapshot &&
         EntityHelpers.parse_to_struct(module.get_entity_struct(), entity_row.snapshot)
 
-    get_state(module, state, entity_row)
+    snapshot_version = entity_row.snapshot_version || 0
+
+    get_state(module, id, snapshot, snapshot_version)
   end
 
-  def get_state(module, state, %EntityRow{} = entity_row) do
-    version = entity_row.snapshot_version || EntityHelpers.get_version(state)
-
+  def get_state(module, entity_id, snapshot, snapshot_version) do
     query =
       from e in EventRow,
         where:
-          e.entity_id == ^entity_row.id and
-            e.entity_version > ^version,
+          e.entity_id == ^entity_id and
+            e.entity_version > ^snapshot_version,
         order_by: e.entity_version,
         select: e
 
     events = Repo.all(query)
-    play_events(module, events, state)
+    play_events(module, events, snapshot)
   end
 
   defp play_events(module, events, state) do
