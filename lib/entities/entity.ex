@@ -153,12 +153,12 @@ defmodule Entities.Entity do
 
       @doc false
       def handle_action(_context, _state, _action) do
-        raise "handle_action/2 not implemented"
+        raise "handle_action/3 not implemented"
       end
 
       @doc false
       def apply_event(_context, _state, _event) do
-        raise "apply_event/2 not implemented"
+        raise "apply_event/3 not implemented"
       end
 
       @doc false
