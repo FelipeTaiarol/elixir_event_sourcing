@@ -259,8 +259,7 @@ defmodule Entities.Entity do
         select: e
 
     events = Repo.all(query)
-    final_state = play_events(module, events, state)
-    final_state
+    play_events(module, events, state)
   end
 
   defp play_events(module, events, state) do
