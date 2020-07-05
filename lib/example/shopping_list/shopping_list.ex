@@ -1,4 +1,5 @@
 defmodule Example.ShoppingList do
+  alias Example.ShoppingList
   alias Example.ShoppingList.Entity
   alias Entities.Context
   alias Example.ShoppingList.Actions.{SetName, AddItem}
@@ -11,21 +12,24 @@ defmodule Example.ShoppingList do
   ]
 
   @type t :: %__MODULE__{
-          id: integer,
-          name: String.t(),
-          version: integer,
-          items: ShoppingList.ShoppingListItem.t()
-        }
+    id: integer,
+    name: String.t(),
+    version: integer,
+    items: list(ShoppingList.t())
+  }
 
+  @spec create(Context.t(), any) :: ShoppingList.t()
   def create(%Context{} = context, %{name: name}) do
     Entity.create(context, %{name: name})
   end
 
+  @spec get(Context.t(), integer) :: ShoppingList.t()
   def get(%Context{} = context, id) when is_integer(id) do
     shopping_list_process(id, context)
     |> Entity.get(context)
   end
 
+  @spec set_name(Context.t(), integer, String.t()) :: ShoppingList.t()
   def set_name(%Context{} = context, shopping_list_id, name)
       when is_integer(shopping_list_id) and is_binary(name) do
     action = %SetName{
@@ -37,17 +41,19 @@ defmodule Example.ShoppingList do
     |> Entity.send_action(context, action)
   end
 
-  def add_item(%Context{} = context, shopping_list_id, %{name: name}) do
+  @spec add_item(Context.t(), integer, any) :: ShoppingList.t()
+  def add_item(%Context{} = context, shopping_list_id, args) when is_integer(shopping_list_id) do
     action = %AddItem{
       id: UUID.uuid1(),
-      name: name,
-      quantity: 1
+      name: args.name,
+      quantity: args.quantity
     }
 
     shopping_list_process(shopping_list_id, context)
     |> Entity.send_action(context, action)
   end
 
+  @spec shopping_list_process(integer, Context.t()) :: pid()
   defp shopping_list_process(shopping_list_id, context) do
     Entities.Supervisor.entity_process(
       Example.ShoppingList.Entity,

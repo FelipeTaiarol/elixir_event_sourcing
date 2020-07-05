@@ -28,6 +28,7 @@ defmodule Example.Schema do
     field :add_item, :shopping_list do
       arg(:shopping_list_id, non_null(:integer))
       arg(:name, non_null(:string))
+      arg(:quantity, non_null(:integer))
       resolve(&Resolver.add_item/3)
     end
   end

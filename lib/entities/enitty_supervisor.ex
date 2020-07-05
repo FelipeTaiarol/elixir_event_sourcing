@@ -1,4 +1,6 @@
 defmodule Entities.Supervisor do
+  alias Entities.Context
+
   def start_link() do
     IO.puts("Starting supervisor")
     DynamicSupervisor.start_link(name: __MODULE__, strategy: :one_for_one)
@@ -12,6 +14,7 @@ defmodule Entities.Supervisor do
     }
   end
 
+  @spec entity_process(any, integer, Context.t()) :: pid()
   def entity_process(entity_module, entity_id, context) do
     case start_child(entity_module, entity_id, context) do
       {:ok, pid} ->

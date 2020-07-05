@@ -32,12 +32,13 @@ defmodule CreateShoppingListTest do
   """
 
   @addItem """
-  mutation ($shoppingListId: Int!, $itemName: String!){
-    addItem(shoppingListId: $shoppingListId, name: $itemName){
+  mutation ($shoppingListId: Int!, $itemName: String!, $quantity: Int!){
+    addItem(shoppingListId: $shoppingListId, name: $itemName, quantity: $quantity){
       id,
       version,
       items {
-        name
+        name,
+        quantity
       }
     }
   }
@@ -88,12 +89,12 @@ defmodule CreateShoppingListTest do
     conn =
       post(conn, "/api", %{
         "query" => @addItem,
-        "variables" => %{shoppingListId: id, itemName: "item 1"}
+        "variables" => %{shoppingListId: id, itemName: "item 1", quantity: 2}
       })
 
     assert json_response(conn, 200) == %{
              "data" => %{
-               "addItem" => %{"id" => id, "version" => 3, "items" => [%{"name" => "item 1"}]}
+               "addItem" => %{"id" => id, "version" => 3, "items" => [%{"name" => "item 1", "quantity" => 2}]}
              }
            }
   end
