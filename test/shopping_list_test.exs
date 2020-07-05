@@ -94,7 +94,11 @@ defmodule CreateShoppingListTest do
 
     assert json_response(conn, 200) == %{
              "data" => %{
-               "addItem" => %{"id" => id, "version" => 3, "items" => [%{"name" => "item 1", "quantity" => 2}]}
+               "addItem" => %{
+                 "id" => id,
+                 "version" => 3,
+                 "items" => [%{"name" => "item 1", "quantity" => 2}]
+               }
              }
            }
   end

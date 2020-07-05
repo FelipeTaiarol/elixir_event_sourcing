@@ -4,6 +4,6 @@ defmodule Entities.Context do
   ]
 
   @type t :: %__MODULE__{
-    user_id: integer
-  }
+          user_id: integer
+        }
 end

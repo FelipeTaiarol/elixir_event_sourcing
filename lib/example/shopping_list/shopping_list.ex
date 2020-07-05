@@ -12,11 +12,11 @@ defmodule Example.ShoppingList do
   ]
 
   @type t :: %__MODULE__{
-    id: integer,
-    name: String.t(),
-    version: integer,
-    items: list(ShoppingList.t())
-  }
+          id: integer,
+          name: String.t(),
+          version: integer,
+          items: list(ShoppingList.t())
+        }
 
   @spec create(Context.t(), any) :: ShoppingList.t()
   def create(%Context{} = context, %{name: name}) do
@@ -32,23 +32,24 @@ defmodule Example.ShoppingList do
   @spec set_name(Context.t(), integer, String.t()) :: ShoppingList.t()
   def set_name(%Context{} = context, shopping_list_id, name)
       when is_integer(shopping_list_id) and is_binary(name) do
-    action = %SetName{
+    %SetName{
       id: shopping_list_id,
       name: name
     }
-
-    shopping_list_process(shopping_list_id, context)
-    |> Entity.send_action(context, action)
+    |> send_action(context, shopping_list_id)
   end
 
   @spec add_item(Context.t(), integer, any) :: ShoppingList.t()
   def add_item(%Context{} = context, shopping_list_id, args) when is_integer(shopping_list_id) do
-    action = %AddItem{
+    %AddItem{
       id: UUID.uuid1(),
       name: args.name,
       quantity: args.quantity
     }
+    |> send_action(context, shopping_list_id)
+  end
 
+  defp send_action(action, %Context{} = context, shopping_list_id) do
     shopping_list_process(shopping_list_id, context)
     |> Entity.send_action(context, action)
   end
